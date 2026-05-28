@@ -1,8 +1,106 @@
 # Velt Skeleton
 
-Repo d'assemblage du Module 2 - Skeleton et Developer Experience.
+Projet applicatif minimal installe par `velt new`.
 
-Ce repository doit fournir le projet applicatif installe par `velt new`. Il ne remplace pas les packages du Module 1 (`kernel`, `http`, `ui`, `database`, `cli`, `preview`) : il les compose dans une structure claire, testable et utilisable par une equipe produit.
+Ce repo est le point d'entree du Module 2 - Skeleton et Developer Experience. Il ne contient pas le framework entier : il assemble les packages du Module 1 (`kernel`, `http`, `ui`, `database`, `cli`) dans une application concrete, executable et testable.
+
+## Etat actuel
+
+Issue 01 - Creer le skeleton installable : implementee.
+
+Le skeleton fournit maintenant :
+
+- un `composer.json` de projet avec dependances Velt locales ;
+- un front controller `public/index.php` ;
+- un bootstrap applicatif `bootstrap/app.php` ;
+- les routes `routes/web.php` et `routes/api.php` ;
+- une feature `features/Home` qui rend une page Velt en HTML ;
+- un binaire projet `bin/velt` ;
+- un `.env.example` ;
+- une base PHPUnit de fumee pour valider `/` et `/api/preview/demo`.
+
+## Installation locale
+
+Depuis ce repo :
+
+```bash
+composer install
+cp .env.example .env
+php bin/velt kernel:check
+php bin/velt serve --dry-run
+composer test
+```
+
+Sur Windows PowerShell :
+
+```powershell
+composer install
+Copy-Item .env.example .env
+php bin/velt kernel:check
+php bin/velt serve --dry-run
+composer test
+```
+
+Pour lancer le serveur :
+
+```bash
+php bin/velt serve
+```
+
+Puis ouvrir `http://127.0.0.1:8000`.
+
+## Routes disponibles
+
+| Methode | Route | Description |
+| --- | --- | --- |
+| GET | `/` | Rend la page d'accueil Velt en HTML via `Velt\Ui\Renderers\WebRenderer`. |
+| GET | `/api/preview/demo` | Retourne une erreur JSON propre quand aucune session preview n'existe. |
+
+Exemple de payload preview sans session :
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "preview_session_missing",
+    "message": "No preview session is available for the demo route."
+  }
+}
+```
+
+## Structure
+
+```text
+bootstrap/
+  app.php
+bin/
+  velt
+config/
+  app.php
+  database.php
+  preview.php
+features/
+  Home/
+    HomePage.php
+public/
+  index.php
+routes/
+  api.php
+  web.php
+tests/
+  Feature/
+    SkeletonSmokeTest.php
+```
+
+## Comment ca marche
+
+`bootstrap/app.php` charge la configuration, instancie `Velt\Kernel\Application`, enregistre les providers HTTP/UI, charge les routes, puis expose le dispatcher HTTP.
+
+`public/index.php` capture la requete HTTP avec `Velt\Http\Request`, la passe au dispatcher, puis envoie la response.
+
+`features/Home/HomePage.php` construit une page declarative avec `Page`, `Card`, `Text` et `Button`, puis la rend en HTML.
+
+`bin/velt` delegue a `Velt\Cli\ApplicationFactory`, ce qui permet d'utiliser les commandes CLI officielles depuis le projet skeleton.
 
 ## Objectif Module 2
 
@@ -85,6 +183,8 @@ php bin/velt serve --dry-run
 composer test
 ```
 
+Les chemins sont relatifs au dossier `github-repos/`, ce qui permet de travailler en symlink sur les packages locaux sans copier le code.
+
 ## Labels GitHub
 
 Les issues Module 2 doivent utiliser les labels suivants :
@@ -103,3 +203,10 @@ Les issues Module 2 doivent utiliser les labels suivants :
 4. Base de tests.
 5. Generateurs CLI alignes.
 6. Standards de documentation.
+
+## Criteres Issue 01
+
+- Le skeleton peut etre clone et installe avec Composer.
+- `php bin/velt serve` lance le projet via le serveur PHP local.
+- La route `/` retourne une page Velt rendue en HTML.
+- La route `/api/preview/demo` retourne une erreur JSON propre si aucune session n'existe.
