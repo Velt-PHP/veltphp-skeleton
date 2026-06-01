@@ -1,5 +1,33 @@
 # Velt Skeleton
 
+This repository contains the application skeleton for Velt framework used for local development and testing.
+
+Usage
+
+- Install dependencies:
+
+```bash
+composer install
+```
+
+- Run tests:
+
+```bash
+composer test
+```
+
+- Start local server:
+
+```bash
+php bin/velt serve 127.0.0.1:8000
+```
+
+Configuration
+
+- Copy `.env.example` to `.env` and edit variables as needed.
+- Configuration files are under `config/` and accessible via `config('app.name')` and helpers `env('KEY', 'default')`.
+# Velt Skeleton
+
 Projet applicatif minimal installe par `velt new`.
 
 Ce repo est le point d'entree du Module 2 - Skeleton et Developer Experience. Il ne contient pas le framework entier : il assemble les packages du Module 1 (`kernel`, `http`, `ui`, `database`, `cli`) dans une application concrete, executable et testable.
