@@ -1,5 +1,30 @@
 #!/usr/bin/env php
 <?php
+declare(strict_types=1);
+
+// Minimal CLI shim for skeleton. Supports `serve` command to run PHP built-in server.
+
+$argv = $_SERVER['argv'] ?? [];
+
+$command = $argv[1] ?? 'help';
+
+switch ($command) {
+    case 'serve':
+        $host = $argv[2] ?? '127.0.0.1:8000';
+        $docroot = __DIR__ . '/../public';
+        echo "Starting PHP built-in server on http://{$host}\n";
+        // exec keeps this process attached to the server
+        passthru(sprintf('php -S %s -t %s', escapeshellarg($host), escapeshellarg($docroot)));
+        break;
+    case 'help':
+    default:
+        echo "Velt skeleton CLI\n";
+        echo "Usage:\n";
+        echo "  php bin/velt serve [host:port]   Start PHP built-in server (default 127.0.0.1:8000)\n";
+        break;
+}
+#!/usr/bin/env php
+<?php
 
 declare(strict_types=1);
 
