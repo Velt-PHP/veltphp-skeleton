@@ -26,6 +26,90 @@ Configuration
 
 - Copy `.env.example` to `.env` and edit variables as needed.
 - Configuration files are under `config/` and accessible via `config('app.name')` and helpers `env('KEY', 'default')`.
+
+Presets (guide rapide)
+
+Le skeleton peut être initialisé avec plusieurs presets d'architecture pour accélérer la création d'un projet Velt. Chaque preset décrit une arborescence minimale et des fichiers recommandés. Les presets disponibles (MVP) :
+
+- `monolith-feature` — structure par feature (par défaut pour applications web simples).
+- `api-only` — structure légère pour API (pas de pages HTML, uniquement JSON endpoints).
+- `mvc-simple` — structure classique MVC avec dossiers `Controllers`, `Models`, `Views`.
+
+Exemples d'arborescences minimales
+
+`monolith-feature`
+
+```
+my-project/
+  features/
+    Home/
+      HomePage.php
+      HomeController.php
+  routes/
+    web.php
+  public/
+    config/
+```
+
+`api-only`
+
+```
+my-project/
+  src/
+    Controllers/
+  routes/
+    api.php
+  public/
+  config/
+```
+
+`mvc-simple`
+
+```
+my-project/
+  app/
+    Controllers/
+    Models/
+    Views/
+  public/
+  routes/
+  config/
+```
+
+Notes
+- Les presets ne modifient pas les composants internes du framework (`kernel`, `http`, `ui`, etc.). Ils génèrent uniquement des fichiers et arborescences côté application.
+- Le CLI et les generateurs sont conçus pour supporter `--preset`, `--dry-run` et `--force`. Le générateur doit vérifier les collisions et proposer un rollback si nécessaire.
+
+CLI (guide rapide)
+
+Le skeleton inclut un shim CLI minimal `bin/velt` qui offre une commande `serve`. À terme la CLI fournira des commandes de génération et d'assistance.
+
+Commandes disponibles aujourd'hui :
+
+```bash
+php bin/velt help
+php bin/velt serve [host:port]    # exemple: php bin/velt serve 127.0.0.1:8000
+```
+
+Commandes prévues pour la génération (exemples d'usage)
+
+```bash
+# Générer un nouveau projet avec preset monolith-feature
+php bin/velt make:project my-project --preset=monolith-feature
+
+# Générer une feature (controller + page + test)
+php bin/velt make:feature auth
+
+# Dry run pour vérifier les fichiers qui seraient créés
+php bin/velt make:project my-project --preset=api-only --dry-run
+```
+
+Bonnes pratiques
+
+- Toujours exécuter `--dry-run` ou vérifier le repository avant d'exécuter un générateur sur un projet existant.
+- Les presets doivent être simples et explicites ; éviter de modifier des fichiers fournis par `kernel`.
+- Documenter tout preset nouveau dans ce README et ajouter un test d'acceptation qui vérifie l'arborescence générée.
+
 # Velt Skeleton
 
 Projet applicatif minimal installe par `velt new`.

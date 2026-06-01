@@ -7,6 +7,12 @@ use PHPUnit\Framework\TestCase;
 use Velt\Http\Request;
 use Velt\Http\Response;
 
+/**
+ * Classe de base pour les tests du skeleton.
+ *
+ * Elle fournit un accès au dispatcher de l'application bootstrapée
+ * afin de simuler des requêtes HTTP dans les tests d'intégration.
+ */
 class VeltTestCase extends TestCase
 {
     protected function dispatcher()
