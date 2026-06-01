@@ -1,23 +1,25 @@
 <?php
 declare(strict_types=1);
 
-// Bootstrap for the skeleton: load Composer autoload, .env and config files.
+// Bootstrap du skeleton : charge l'autoload Composer, le fichier .env et les configs.
 require __DIR__ . '/../vendor/autoload.php';
 
 use Dotenv\Dotenv;
 
-// Load .env if present
+// Charger .env si présent (utile en développement local)
 if (file_exists(__DIR__ . '/../.env')) {
     $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
     $dotenv->load();
 }
 
-// Load config files into memory (helpers provide velt_load_config)
+// Charger les fichiers de configuration via les helpers du skeleton
 if (function_exists('velt_load_config')) {
     velt_load_config(__DIR__ . '/../config');
 }
 
-// Build the Application using velt kernel and register providers required by the skeleton.
+// Construction de l'application à partir du kernel. Nous enregistrons
+// ici les providers nécessaires au skeleton (HTTP + UI) et enregistrons
+// les routes avant d'appeler le cycle `boot()`.
 use Velt\Kernel\Application;
 use Velt\Http\Integration\HttpServiceProvider;
 use Velt\Kernel\Ui\UiServiceProvider;
@@ -35,12 +37,11 @@ $app = new Application($basePath, $config);
 $app->registerProvider(HttpServiceProvider::class);
 $app->registerProvider(UiServiceProvider::class);
 
-$app->boot();
-
 /** @var Router $router */
 $router = $app->container()->get(Router::class);
 
-// Register skeleton routes (web + api)
+// Enregistrer les routes du skeleton (web + api). Les fichiers de routes
+// doivent renvoyer un callable acceptant (Router, Application).
 foreach (['web', 'api'] as $routesFile) {
     $path = $basePath . '/routes/' . $routesFile . '.php';
     if (file_exists($path)) {
@@ -51,6 +52,7 @@ foreach (['web', 'api'] as $routesFile) {
     }
 }
 
+// Démarrer le cycle de vie de l'application (providers, bindings, etc.).
 $app->boot();
 
 return [
