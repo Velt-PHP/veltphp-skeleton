@@ -1,5 +1,5 @@
 {
-    "name": "veltphp/skeleton",
+    "name": "velt/skeleton",
     "description": "Installable application skeleton for the Velt framework.",
     "type": "project",
     "license": "MIT",
