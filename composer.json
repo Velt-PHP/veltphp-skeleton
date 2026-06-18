@@ -22,47 +22,6 @@
             "Tests\\": "tests/"
         }
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../veltphp-kernel/packages/kernel",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "../veltphp-http",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "../velt-ui",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "../velt-database",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "../veltphp-cli",
-            "options": {
-                "symlink": true
-            }
-        }
-    ],
-    "scripts": {
-        "test": "@php vendor/bin/phpunit",
-        "serve": "php bin/velt serve"
-    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }
