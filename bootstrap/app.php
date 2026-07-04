@@ -22,7 +22,7 @@ if (function_exists('velt_load_config')) {
 // les routes avant d'appeler le cycle `boot()`.
 use Velt\Kernel\Application;
 use Velt\Http\Integration\HttpServiceProvider;
-use Velt\Kernel\Ui\UiServiceProvider;
+use Velt\Ui\Providers\UiServiceProvider;
 use Velt\Http\Router;
 use Velt\Http\Dispatcher;
 
@@ -38,7 +38,8 @@ $app->registerProvider(HttpServiceProvider::class);
 $app->registerProvider(UiServiceProvider::class);
 
 /** @var Router $router */
-$router = $app->container()->get(Router::class);
+$router = new Router();
+$app->container()->instance(Router::class, $router);
 
 // Enregistrer les routes du skeleton (web + api). Les fichiers de routes
 // doivent renvoyer un callable acceptant (Router, Application).

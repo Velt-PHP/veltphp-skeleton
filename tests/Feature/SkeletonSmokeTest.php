@@ -7,9 +7,15 @@ namespace Tests\Feature;
 use PHPUnit\Framework\TestCase;
 use Velt\Http\Dispatcher;
 use Velt\Http\Request;
+use Velt\Ui\Providers\UiServiceProvider;
 
 final class SkeletonSmokeTest extends TestCase
 {
+    public function test_ui_service_provider_is_available_from_generated_project_autoload(): void
+    {
+        self::assertTrue(class_exists(UiServiceProvider::class));
+    }
+
     public function test_home_route_returns_rendered_velt_page(): void
     {
         $response = $this->dispatcher()->dispatch(new Request('GET', '/'));

@@ -5,7 +5,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "velt/framework":"^0.1.0",
+        "velt/framework": "^0.1.0",
+        "velt/ui": "^0.1.0",
         "vlucas/phpdotenv": "^5.5"
     },
     "require-dev": {
@@ -21,6 +22,91 @@
         "psr-4": {
             "Tests\\": "tests/"
         }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../veltphp-framework",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "velt/framework": "0.1.1"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "../velt-ui",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "velt/ui": "0.1.0"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "../veltphp-kernel",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "velt/kernel": "0.1.1"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "../veltphp-http",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "velt/http": "0.1.1"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "../velt-database",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "velt/database": "0.1.0"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "../veltphp-orm",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "velt/orm": "0.1.0"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "../veltphp-cli",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "velt/cli": "0.2.0"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "../velt-preview",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "velt/preview": "0.1.0"
+                }
+            }
+        }
+    ],
+    "scripts": {
+        "test": "phpunit"
     },
     "minimum-stability": "dev",
     "prefer-stable": true
