@@ -12,7 +12,7 @@ final class VeltTestCaseUsageTest extends VeltTestCase
         $response = $this->get('/');
 
         self::assertStatus($response, 200);
-        self::assertSee($response, 'Build once. Render for web and preview.');
+        self::assertSee($response, 'Framework PHP modulaire pour interfaces declaratives');
     }
 
     public function test_api_preview_returns_json_error(): void

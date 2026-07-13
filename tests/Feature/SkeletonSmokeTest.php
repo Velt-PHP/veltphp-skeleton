@@ -34,7 +34,7 @@ final class SkeletonSmokeTest extends TestCase
         self::assertSame(200, $response->status());
         self::assertStringContainsString('<!doctype html>', $response->body());
         self::assertStringContainsString('/assets/app.css', $response->body());
-        self::assertStringContainsString('Build once. Render for web and preview.', $response->body());
+        self::assertStringContainsString('Framework PHP modulaire pour interfaces declaratives', $response->body());
         self::assertStringContainsString('logo-mark', $response->body());
     }
 
@@ -48,7 +48,7 @@ final class SkeletonSmokeTest extends TestCase
         self::assertSame(200, $docs->status());
         self::assertSame(200, $database->status());
         self::assertStringContainsString('Documentation', $docs->body());
-        self::assertStringContainsString('Backend and database', $database->body());
+        self::assertStringContainsString('Backend et base de donnees', $database->body());
     }
 
     public function test_migrations_seeders_model_and_projects_api_work_together(): void
