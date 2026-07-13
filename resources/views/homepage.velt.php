@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Velt\Ui\Components\Button;
 use Velt\Ui\Components\Card;
 use Velt\Ui\Components\Link;
 use Velt\Ui\Components\Text;
@@ -11,8 +10,8 @@ use Velt\Ui\Page;
 return Page::make('Velt')
     ->layout('guest')
     ->meta([
-        'title' => 'Velt - Build clean PHP applications',
-        'description' => 'A complete Velt starter with UI, routes, database, ORM, migrations and Tailwind.',
+        'title' => 'Velt - Framework PHP declaratif et modulaire',
+        'description' => 'Velt est un framework PHP moderne pour construire des applications web, API et previews JSON avec une UI declarative.',
         'stylesheets' => ['/assets/app.css'],
     ])
     ->add(
@@ -27,29 +26,20 @@ return Page::make('Velt')
             )
             ->add(
                 Card::make()
-                    ->class('hero-grid')
+                    ->class('hero-centered')
                     ->add(
                         Card::make()
                             ->class('hero-copy')
-                            ->add(Text::make('Velt')->as('h1')->class('hero-title'))
-                            ->add(Text::make('A royal blue PHP framework starter for elegant full-stack demos.')->class('hero-subtitle'))
-                            ->add(Text::make('The skeleton ships with declarative Velt views, HTTP routes, SQLite configuration, migrations, seeders, an ORM model and Tailwind-ready assets.')->class('hero-text'))
+                            ->add(Text::make('Velt')->as('span')->class('hero-logo'))
+                            ->add(Text::make('Build once. Render for web and preview.')->as('h1')->class('hero-title'))
+                            ->add(Text::make('Velt est un framework PHP modulaire qui assemble kernel, HTTP, UI declarative, database, ORM et CLI dans une base claire pour developper vite sans perdre la structure.')->class('hero-subtitle'))
+                            ->add(Text::make('Une page Velt est un arbre de composants PHP. Le meme code peut etre rendu en HTML pour le navigateur ou expose en JSON pour une preview mobile et des clients modernes.')->class('hero-text'))
                             ->add(
                                 Card::make()
                                     ->class('hero-actions')
-                                    ->add(Link::make('Read the docs', '/docs')->class('button button-primary'))
-                                    ->add(Link::make('Explore data', '/database')->class('button button-ghost'))
+                                    ->add(Link::make('Explore Velt', '/docs')->class('button button-primary'))
+                                    ->add(Link::make('View data layer', '/database')->class('button button-ghost'))
                             )
-                    )
-                    ->add(
-                        Card::make()
-                            ->class('preview-panel')
-                            ->add(Text::make('Application ready')->as('strong')->class('panel-kicker'))
-                            ->add(Text::make('frontend')->class('status-line'))
-                            ->add(Text::make('backend')->class('status-line'))
-                            ->add(Text::make('database')->class('status-line'))
-                            ->add(Text::make('tailwind')->class('status-line'))
-                            ->add(Button::make('php bin/velt serve')->variant('primary')->class('command-pill'))
                     )
             )
             ->add(
@@ -59,22 +49,29 @@ return Page::make('Velt')
                         Card::make()
                             ->class('feature-card')
                             ->add(Text::make('01')->as('small')->class('feature-index'))
-                            ->add(Text::make('Declarative UI')->as('h2')->class('feature-title'))
-                            ->add(Text::make('Pages are written in .velt.php files and rendered by the Velt UI renderer.')->class('feature-text'))
+                            ->add(Text::make('UI declarative')->as('h2')->class('feature-title'))
+                            ->add(Text::make('Composez vos interfaces avec Page, Card, Text, Form, Input et Button dans des fichiers .velt.php lisibles et testables.')->class('feature-text'))
                     )
                     ->add(
                         Card::make()
                             ->class('feature-card')
                             ->add(Text::make('02')->as('small')->class('feature-index'))
-                            ->add(Text::make('Data included')->as('h2')->class('feature-title'))
-                            ->add(Text::make('SQLite, migrations, seeders and ORM models are wired for a complete demo.')->class('feature-text'))
+                            ->add(Text::make('Feature based MVC')->as('h2')->class('feature-title'))
+                            ->add(Text::make('Organisez chaque domaine avec ses controllers, models et vues au meme endroit pour garder la logique proche du besoin metier.')->class('feature-text'))
                     )
                     ->add(
                         Card::make()
                             ->class('feature-card')
                             ->add(Text::make('03')->as('small')->class('feature-index'))
-                            ->add(Text::make('Tailwind first')->as('h2')->class('feature-title'))
-                            ->add(Text::make('The default project includes Tailwind config, source CSS and compiled demo styles.')->class('feature-text'))
+                            ->add(Text::make('Full-stack starter')->as('h2')->class('feature-title'))
+                            ->add(Text::make('Routes web, API JSON, migrations, seeders, ORM, SQLite et Tailwind sont deja relies pour une demo complete.')->class('feature-text'))
+                    )
+                    ->add(
+                        Card::make()
+                            ->class('feature-card')
+                            ->add(Text::make('04')->as('small')->class('feature-index'))
+                            ->add(Text::make('Preview ready')->as('h2')->class('feature-title'))
+                            ->add(Text::make('Le rendu JSON pose les bases d une preview mobile: une interface decrite une fois, puis transformee selon le contexte.')->class('feature-text'))
                     )
             )
     );

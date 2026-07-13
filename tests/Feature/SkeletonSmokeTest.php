@@ -34,7 +34,7 @@ final class SkeletonSmokeTest extends TestCase
         self::assertSame(200, $response->status());
         self::assertStringContainsString('<!doctype html>', $response->body());
         self::assertStringContainsString('/assets/app.css', $response->body());
-        self::assertStringContainsString('Build clean PHP applications', $response->body());
+        self::assertStringContainsString('Build once. Render for web and preview.', $response->body());
         self::assertStringContainsString('logo-mark', $response->body());
     }
 
