@@ -1,27 +1,100 @@
 #!/usr/bin/env php
 <?php
+
 declare(strict_types=1);
 
-// Petit binaire CLI pour le skeleton. Actuellement uniquement
-// utilisé pour démarrer un serveur PHP intégré en local lors du
-// développement ou des démonstrations rapides.
+use Velt\Database\Migrations\Migrator;
+use Velt\Database\Seeders\SeederRunner;
 
+$basePath = dirname(__DIR__);
 $argv = $_SERVER['argv'] ?? [];
-
 $command = $argv[1] ?? 'help';
 
-switch ($command) {
-    case 'serve':
-        $host = $argv[2] ?? '127.0.0.1:8000';
-        $docroot = __DIR__ . '/../public';
-        echo "Démarrage du serveur PHP intégré sur http://{$host}\n";
-        // Lancer le serveur intégré et transmettre la sortie au terminal.
-        passthru(sprintf('php -S %s -t %s', escapeshellarg($host), escapeshellarg($docroot)));
-        break;
-    case 'help':
-    default:
-        echo "Velt skeleton CLI\n";
-        echo "Usage:\n";
-        echo "  php bin/velt serve [host:port]   Démarrer le serveur PHP intégré (par défaut 127.0.0.1:8000)\n";
-        break;
+if ($command === 'serve') {
+    $host = $argv[2] ?? '127.0.0.1:8000';
+    $docroot = $basePath . '/public';
+    echo "Starting Velt on http://{$host}\n";
+    passthru(sprintf('php -S %s -t %s', escapeshellarg($host), escapeshellarg($docroot)));
+    exit(0);
+}
+
+$kernel = require $basePath . '/bootstrap/app.php';
+
+try {
+    match ($command) {
+        'migrate' => migrate($basePath),
+        'migrate:rollback' => rollback($basePath),
+        'db:seed' => seed($basePath),
+        'kernel:check' => kernelCheck($kernel),
+        'help' => help(),
+        default => unknown($command),
+    };
+} catch (Throwable $exception) {
+    fwrite(STDERR, "Velt error: {$exception->getMessage()}\n");
+    exit(1);
+}
+
+function migrate(string $basePath): void
+{
+    $executed = (new Migrator($basePath . '/database/migrations'))->migrate();
+
+    if ($executed === []) {
+        echo "Nothing to migrate.\n";
+        return;
+    }
+
+    foreach ($executed as $migration) {
+        echo "Migrated: {$migration}\n";
+    }
+}
+
+function rollback(string $basePath): void
+{
+    $rolledBack = (new Migrator($basePath . '/database/migrations'))->rollback();
+
+    if ($rolledBack === []) {
+        echo "Nothing to roll back.\n";
+        return;
+    }
+
+    foreach ($rolledBack as $migration) {
+        echo "Rolled back: {$migration}\n";
+    }
+}
+
+function seed(string $basePath): void
+{
+    (new SeederRunner())->run(Database\Seeders\DatabaseSeeder::class);
+
+    echo "Database seeded.\n";
+}
+
+/**
+ * @param array<string, mixed> $kernel
+ */
+function kernelCheck(array $kernel): void
+{
+    foreach (['app', 'router', 'dispatcher'] as $key) {
+        if (! array_key_exists($key, $kernel)) {
+            throw new RuntimeException("Kernel entry [{$key}] is missing.");
+        }
+    }
+
+    echo "Velt kernel is ready.\n";
+}
+
+function help(): void
+{
+    echo "Velt project CLI\n";
+    echo "Usage:\n";
+    echo "  php bin/velt serve [host:port]\n";
+    echo "  php bin/velt migrate\n";
+    echo "  php bin/velt migrate:rollback\n";
+    echo "  php bin/velt db:seed\n";
+    echo "  php bin/velt kernel:check\n";
+}
+
+function unknown(string $command): void
+{
+    throw new InvalidArgumentException("Unknown command [{$command}]. Run php bin/velt help.");
 }

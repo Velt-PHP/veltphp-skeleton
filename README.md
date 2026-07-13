@@ -1,324 +1,211 @@
 # Velt Skeleton
 
-This repository contains the application skeleton for Velt framework used for local development and testing.
+Velt Skeleton est le point de depart officiel pour creer une application Velt. Il fournit une base production-ready pour une demo complete: frontend declaratif, routes HTTP, API JSON, configuration, base de donnees, migrations, seeders, ORM, Tailwind et tests.
 
-Usage
+Velt reste volontairement simple: une application PHP moderne, organisee en MVC + feature-based, avec une syntaxe UI declarative en `.velt.php`.
 
-- Install dependencies:
-
-```bash
-composer install
-```
-
-- Run tests:
-
-```bash
-composer test
-```
-
-- Start local server:
-
-```bash
-php bin/velt serve 127.0.0.1:8000
-```
-
-Configuration
-
-- Copy `.env.example` to `.env` and edit variables as needed.
-- Configuration files are under `config/` and accessible via `config('app.name')` and helpers `env('KEY', 'default')`.
-
-Presets (guide rapide)
-
-Le skeleton peut être initialisé avec plusieurs presets d'architecture pour accélérer la création d'un projet Velt. Chaque preset décrit une arborescence minimale et des fichiers recommandés. Les presets disponibles (MVP) :
-
-- `monolith-feature` — structure par feature (par défaut pour applications web simples).
-- `api-only` — structure légère pour API (pas de pages HTML, uniquement JSON endpoints).
-- `mvc-simple` — structure classique MVC avec dossiers `Controllers`, `Models`, `Views`.
-
-Exemples d'arborescences minimales
-
-`monolith-feature`
-
-```
-my-project/
-  features/
-    Home/
-      HomePage.php
-      HomeController.php
-  routes/
-    web.php
-  public/
-    config/
-```
-
-`api-only`
-
-```
-my-project/
-  src/
-    Controllers/
-  routes/
-    api.php
-  public/
-  config/
-```
-
-`mvc-simple`
-
-```
-my-project/
-  app/
-    Controllers/
-    Models/
-    Views/
-  public/
-  routes/
-  config/
-```
-
-Notes
-- Les presets ne modifient pas les composants internes du framework (`kernel`, `http`, `ui`, etc.). Ils génèrent uniquement des fichiers et arborescences côté application.
-- Le CLI et les generateurs sont conçus pour supporter `--preset`, `--dry-run` et `--force`. Le générateur doit vérifier les collisions et proposer un rollback si nécessaire.
-
-CLI (guide rapide)
-
-Le skeleton inclut un shim CLI minimal `bin/velt` qui offre une commande `serve`. À terme la CLI fournira des commandes de génération et d'assistance.
-
-Commandes disponibles aujourd'hui :
-
-```bash
-php bin/velt help
-php bin/velt serve [host:port]    # exemple: php bin/velt serve 127.0.0.1:8000
-```
-
-Commandes prévues pour la génération (exemples d'usage)
-
-```bash
-# Générer un nouveau projet avec preset monolith-feature
-php bin/velt make:project my-project --preset=monolith-feature
-
-# Générer une feature (controller + page + test)
-php bin/velt make:feature auth
-
-# Dry run pour vérifier les fichiers qui seraient créés
-php bin/velt make:project my-project --preset=api-only --dry-run
-```
-
-Bonnes pratiques
-
-- Toujours exécuter `--dry-run` ou vérifier le repository avant d'exécuter un générateur sur un projet existant.
-- Les presets doivent être simples et explicites ; éviter de modifier des fichiers fournis par `kernel`.
-- Documenter tout preset nouveau dans ce README et ajouter un test d'acceptation qui vérifie l'arborescence générée.
-
-# Velt Skeleton
-
-Projet applicatif minimal installe par `velt new`.
-
-Ce repo est le point d'entree du Module 2 - Skeleton et Developer Experience. Il ne contient pas le framework entier : il assemble les packages du Module 1 (`kernel`, `http`, `ui`, `database`, `cli`) dans une application concrete, executable et testable.
-
-## Etat actuel
-
-Issue 01 - Creer le skeleton installable : implementee.
-
-Le skeleton fournit maintenant :
-
-- un `composer.json` de projet avec dependances Velt locales ;
-- un front controller `public/index.php` ;
-- un bootstrap applicatif `bootstrap/app.php` ;
-- les routes `routes/web.php` et `routes/api.php` ;
-- une feature `features/Home` qui rend une page Velt en HTML ;
-- un binaire projet `bin/velt` ;
-- un `.env.example` ;
-- une base PHPUnit de fumee pour valider `/` et `/api/preview/demo`.
-
-## Installation locale
-
-Depuis ce repo :
+## Installation
 
 ```bash
 composer install
 cp .env.example .env
-php bin/velt kernel:check
-php bin/velt serve --dry-run
-composer test
+php bin/velt migrate
+php bin/velt db:seed
+php bin/velt serve
 ```
 
-Sur Windows PowerShell :
+Sur Windows PowerShell:
 
 ```powershell
 composer install
 Copy-Item .env.example .env
-php bin/velt kernel:check
-php bin/velt serve --dry-run
-composer test
-```
-
-Pour lancer le serveur :
-
-```bash
+php bin/velt migrate
+php bin/velt db:seed
 php bin/velt serve
 ```
 
-Puis ouvrir `http://127.0.0.1:8000`.
+L'application demarre par defaut sur `http://127.0.0.1:8000`.
 
-## Routes disponibles
+## Stack incluse
 
-| Methode | Route | Description |
-| --- | --- | --- |
-| GET | `/` | Rend la page d'accueil Velt en HTML via `Velt\Ui\Renderers\WebRenderer`. |
-| GET | `/api/preview/demo` | Retourne une erreur JSON propre quand aucune session preview n'existe. |
+- `velt/framework` pour l'assemblage applicatif.
+- `velt/http` pour les routes, requetes, reponses et dispatch.
+- `velt/ui` pour les pages declaratives `.velt.php`.
+- `velt/database` pour PDO, query builder, schema builder, migrations et seeders.
+- `velt/orm` pour les modeles Active Record.
+- Tailwind CSS configure par defaut.
+- PHPUnit pour les tests de fumee et d'integration.
 
-Exemple de payload preview sans session :
+## Architecture
 
-```json
-{
-  "success": false,
-  "error": {
-    "code": "preview_session_missing",
-    "message": "No preview session is available for the demo route."
-  }
-}
-```
-
-## Structure
+Le skeleton suit une architecture MVC + feature-based.
 
 ```text
-bootstrap/
-  app.php
-bin/
-  velt
-config/
-  app.php
-  database.php
-  preview.php
 features/
   Home/
-    HomePage.php
-public/
-  index.php
+    Controllers/
+      HomeController.php
+  Documentation/
+    Controllers/
+      DocumentationController.php
+  Projects/
+    Controllers/
+      ProjectApiController.php
+    Models/
+      Project.php
+  Shared/
+    Controllers/
+      Controller.php
+
+resources/
+  views/
+    homepage.velt.php
+    docs.velt.php
+    database.velt.php
+  css/
+    app.css
+
+database/
+  migrations/
+    2026_07_13_000000_create_projects_table.php
+  seeders/
+    DatabaseSeeder.php
+
 routes/
-  api.php
   web.php
-tests/
-  Feature/
-    SkeletonSmokeTest.php
+  api.php
 ```
 
-## Comment ca marche
+Chaque feature regroupe sa logique applicative. Les controllers restent dans `features/*/Controllers`, les models dans `features/*/Models`, et les vues declaratives dans `resources/views`.
 
-`bootstrap/app.php` charge la configuration, instancie `Velt\Kernel\Application`, enregistre les providers HTTP/UI, charge les routes, puis expose le dispatcher HTTP.
+## Routes
 
-`public/index.php` capture la requete HTTP avec `Velt\Http\Request`, la passe au dispatcher, puis envoie la response.
-
-`features/Home/HomePage.php` construit une page declarative avec `Page`, `Card`, `Text` et `Button`, puis la rend en HTML.
-
-`bin/velt` delegue a `Velt\Cli\ApplicationFactory`, ce qui permet d'utiliser les commandes CLI officielles depuis le projet skeleton.
-
-## Objectif Module 2
-
-Le Module 2 transforme les composants bas niveau du Module 1 en experience developpeur concrete :
-
-- creer un projet Velt minimal installable ;
-- exposer `.env.example` et `config/*.php` sans reinventer le loader du kernel ;
-- proposer des presets d'architecture simples ;
-- fournir une base PHPUnit pour applications Velt ;
-- aligner les generateurs CLI sur la structure du skeleton ;
-- poser les standards de documentation et de contribution.
-
-## Perimetre du repo
-
-Inclus dans ce repo :
-
-- `composer.json` du projet skeleton ;
-- `public/index.php` comme front controller ;
-- `bin/velt` pour les commandes projet ;
-- `config/app.php`, `config/database.php`, `config/preview.php` ;
-- `routes/web.php` et `routes/api.php` ;
-- structure `features/` par defaut ;
-- `.env.example` ;
-- presets MVP documentes ;
-- tests de fumee du projet genere.
-
-Exclus de ce repo :
-
-- implementation interne du kernel ;
-- routeur HTTP complet ;
-- moteur UI ;
-- ORM avance ;
-- systeme de preview mobile avance ;
-- generateurs CLI eux-memes, sauf exemples et integration.
-
-## Sous-modules et repos
-
-| Sous-module | Repo cible | Decision |
+| Methode | URI | Action |
 | --- | --- | --- |
-| 01 - Project Skeleton | `Velt-PHP/veltphp-skeleton` | Implementation principale |
-| 02 - Architecture Presets | `Velt-PHP/veltphp-skeleton` + `Velt-PHP/veltphp-cli` | Presets dans le skeleton, selection via CLI |
-| 03 - Config Environment | `Velt-PHP/veltphp-skeleton` au MVP | Extraire vers `veltphp/config` seulement si l'API devient stable |
-| 04 - Testing Foundation | `veltphp/testing` recommande | Peut demarrer comme dossier `tests/` du skeleton avant extraction |
-| 05 - Code Generators | `Velt-PHP/veltphp-cli` | Adapter les commandes `make:*` au skeleton |
-| 06 - Documentation Standards | `veltphp/docs` recommande | Peut demarrer comme conventions partagees dans ce repo |
+| GET | `/` | Page welcome Velt |
+| GET | `/docs` | Documentation rapide du projet |
+| GET | `/database` | Explication backend et database |
+| GET | `/api/projects` | JSON depuis `App\Projects\Models\Project` |
+| GET | `/api/preview/demo` | Erreur JSON propre pour la preview sans session |
 
-## Definition of Done
+## Vues Velt
 
-- `velt new blog` cree un projet minimal depuis ce skeleton.
-- `composer install` fonctionne avec les packages Velt locaux via `path repositories`.
-- `php bin/velt serve` demarre le projet.
-- La route `/` retourne une page Velt rendue en HTML.
-- Une route preview JSON expose un contrat d'erreur propre si aucune session n'existe.
-- Les presets `monolith-feature`, `api-only` et `mvc-simple` sont documentes.
-- Les tests de base peuvent etre lances sans configuration cachee.
+Les pages ne sont pas ecrites en HTML brut. Une vue Velt retourne une instance `Velt\Ui\Page`.
 
-## Workflow local attendu
+```php
+<?php
 
-Tant que les packages ne sont pas publies sur Packagist, utiliser des repositories Composer de type `path` :
+use Velt\Ui\Components\Card;
+use Velt\Ui\Components\Text;
+use Velt\Ui\Page;
 
-```json
+return Page::make('Dashboard')
+    ->meta(['title' => 'Dashboard - Velt'])
+    ->add(
+        Card::make()
+            ->class('panel')
+            ->add(Text::make('Bienvenue')->as('h1'))
+    );
+```
+
+Le rendu web est assure par `Velt\Ui\Renderers\WebRenderer`.
+
+## Base de donnees
+
+SQLite est configure par defaut pour faciliter les demos locales.
+
+```env
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
+```
+
+Lancer les migrations:
+
+```bash
+php bin/velt migrate
+```
+
+Charger les donnees de demo:
+
+```bash
+php bin/velt db:seed
+```
+
+Rollback de la derniere batch:
+
+```bash
+php bin/velt migrate:rollback
+```
+
+Exemple de modele:
+
+```php
+namespace App\Projects\Models;
+
+use Velt\Orm\Model;
+
+final class Project extends Model
 {
-  "repositories": [
-    { "type": "path", "url": "../veltphp-kernel/packages/kernel", "options": { "symlink": true } },
-    { "type": "path", "url": "../veltphp-http", "options": { "symlink": true } },
-    { "type": "path", "url": "../velt-ui", "options": { "symlink": true } },
-    { "type": "path", "url": "../velt-database", "options": { "symlink": true } },
-    { "type": "path", "url": "../veltphp-cli", "options": { "symlink": true } }
-  ]
+    protected static string $table = 'projects';
 }
 ```
 
-Verification minimale :
+## Tailwind
+
+Tailwind est inclus par defaut pour que chaque nouveau projet Velt ait une base frontend propre.
 
 ```bash
-composer install
-composer dump-autoload
+npm install
+npm run build
+```
+
+Fichiers principaux:
+
+- `tailwind.config.js`
+- `postcss.config.js`
+- `resources/css/app.css`
+- `public/assets/app.css`
+
+La page welcome utilise une identite blanche et bleu royal vers bleu ciel, avec le logo Velt dans `public/assets/velt-logo.png`.
+
+## CLI
+
+```bash
+php bin/velt help
+php bin/velt serve
 php bin/velt kernel:check
-php bin/velt serve --dry-run
+php bin/velt migrate
+php bin/velt migrate:rollback
+php bin/velt db:seed
+```
+
+## Tests
+
+```bash
 composer test
 ```
 
-Les chemins sont relatifs au dossier `github-repos/`, ce qui permet de travailler en symlink sur les packages locaux sans copier le code.
+Les tests couvrent:
 
-## Labels GitHub
+- rendu de la page welcome;
+- pages `/docs` et `/database`;
+- migration `projects`;
+- seeder `DatabaseSeeder`;
+- modele ORM `Project`;
+- API `/api/projects`;
+- contrat JSON de `/api/preview/demo`.
 
-Les issues Module 2 doivent utiliser les labels suivants :
+## Checklist production
 
-- `module:2-skeleton-dx`
-- `area:skeleton`, `area:cli`, `area:config`, `area:testing`, `area:docs`
-- `type:feature`, `type:architecture`, `type:tests`, `type:documentation`
-- `priority:p0`, `priority:p1`, `priority:p2`
-- `status:ready`
+Avant publication:
 
-## Ordre de livraison
+```bash
+composer validate
+composer install
+composer test
+php bin/velt kernel:check
+php bin/velt migrate
+php bin/velt db:seed
+```
 
-1. Skeleton installable.
-2. Presets MVP.
-3. Configuration projet.
-4. Base de tests.
-5. Generateurs CLI alignes.
-6. Standards de documentation.
-
-## Criteres Issue 01
-
-- Le skeleton peut etre clone et installe avec Composer.
-- `php bin/velt serve` lance le projet via le serveur PHP local.
-- La route `/` retourne une page Velt rendue en HTML.
-- La route `/api/preview/demo` retourne une erreur JSON propre si aucune session n'existe.
+Pour une release Packagist, taguer le repo seulement quand cette checklist est verte.

@@ -25,11 +25,19 @@ final class HelpersTest extends TestCase
 
     public function test_config_loader_and_accessor(): void
     {
-        // load config files from project config dir
+        $previousEnv = getenv('APP_ENV');
+        putenv('APP_ENV=local');
+
         velt_load_config(dirname(__DIR__, 2) . '/config');
 
         $this->assertIsArray(config('app') ?? []);
         $this->assertSame('Velt App', config('app.name'));
         $this->assertSame('local', config('app.env'));
+
+        if ($previousEnv === false) {
+            putenv('APP_ENV');
+        } else {
+            putenv('APP_ENV=' . $previousEnv);
+        }
     }
 }

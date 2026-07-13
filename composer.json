@@ -5,7 +5,9 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "velt/database": "^0.1.0",
         "velt/framework": "^0.1.0",
+        "velt/orm": "^0.1.0",
         "velt/ui": "^0.1.0",
         "vlucas/phpdotenv": "^5.5"
     },
@@ -14,7 +16,8 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "features/"
+            "App\\": "features/",
+            "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
             "src/helpers.php"

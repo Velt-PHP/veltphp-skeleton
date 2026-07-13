@@ -12,7 +12,7 @@ final class VeltTestCaseUsageTest extends VeltTestCase
         $response = $this->get('/');
 
         self::assertStatus($response, 200);
-        self::assertSee($response, 'Velt App');
+        self::assertSee($response, 'Build clean PHP applications');
     }
 
     public function test_api_preview_returns_json_error(): void
