@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Projects\Controllers\ProjectApiController;
+use App\Preview\Controllers\PreviewController;
 use Velt\Http\JsonResponse;
 use Velt\Http\Router;
 
@@ -16,4 +17,7 @@ return static function (Router $router): void {
             'message' => 'No preview session is available for the demo route.',
         ],
     ], 404));
+
+    $router->get('/api/preview/{id}', [PreviewController::class, 'show']);
+    $router->get('/api/session/{id}', [PreviewController::class, 'session']);
 };

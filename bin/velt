@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 use Velt\Database\Migrations\Migrator;
 use Velt\Database\Seeders\SeederRunner;
+use App\Preview\Services\PreviewService;
 
 $basePath = dirname(__DIR__);
 $argv = $_SERVER['argv'] ?? [];
@@ -25,6 +26,7 @@ try {
         'migrate' => migrate($basePath),
         'migrate:rollback' => rollback($basePath),
         'db:seed' => seed($basePath),
+        'preview' => preview($basePath, $argv[2] ?? null),
         'kernel:check' => kernelCheck($kernel),
         'help' => help(),
         default => unknown($command),
@@ -32,6 +34,19 @@ try {
 } catch (Throwable $exception) {
     fwrite(STDERR, "Velt error: {$exception->getMessage()}\n");
     exit(1);
+}
+
+function preview(string $basePath, ?string $host): void
+{
+    $service = new PreviewService($basePath);
+    $session = $service->createSession($host);
+
+    echo "Velt mobile preview\n";
+    echo "ID: {$session['id']}\n";
+    echo "URL: {$session['url']}\n";
+    echo "QR image: {$session['qr_image']}\n";
+    echo $service->qrTerminal((string) $session['qr_payload']);
+    echo "Scan this code with the Velt Preview app.\n";
 }
 
 function migrate(string $basePath): void
@@ -88,6 +103,7 @@ function help(): void
     echo "Velt project CLI\n";
     echo "Usage:\n";
     echo "  php bin/velt serve [host:port]\n";
+    echo "  php bin/velt preview [host:port]\n";
     echo "  php bin/velt migrate\n";
     echo "  php bin/velt migrate:rollback\n";
     echo "  php bin/velt db:seed\n";

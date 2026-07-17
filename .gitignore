@@ -9,3 +9,4 @@ composer.lock
 database/*.sqlite
 node_modules/
 /public/assets/*.map
+/storage/preview/

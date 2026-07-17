@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use PHPUnit\Framework\TestCase;
+use App\Preview\Services\PreviewService;
 use Velt\Database\Migrations\Migrator;
 use Velt\Database\Seeders\SeederRunner;
 use Velt\Http\Dispatcher;
@@ -86,6 +87,27 @@ final class SkeletonSmokeTest extends TestCase
 
         self::assertSame(false, $payload['success'] ?? null);
         self::assertSame('preview_session_missing', $payload['error']['code'] ?? null);
+    }
+
+    public function test_preview_session_returns_minimal_welcome_payload(): void
+    {
+        $basePath = dirname(__DIR__, 2);
+        $service = new PreviewService($basePath);
+        $session = $service->createSession('127.0.0.1:8000');
+
+        self::assertFileExists($basePath . '/' . $session['qr_image']);
+
+        $response = $this->dispatcher()->dispatch(new Request('GET', '/api/preview/' . $session['id']));
+
+        self::assertSame(200, $response->status());
+        self::assertSame('application/json', $response->headers()['Content-Type'] ?? null);
+
+        $payload = json_decode($response->body(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame('1.0', $payload['schemaVersion']);
+        self::assertSame('home', $payload['screen']);
+        self::assertSame('Text', $payload['components'][0]['type']);
+        self::assertSame('Welcome!', $payload['components'][0]['value']);
     }
 
     private function dispatcher(): Dispatcher

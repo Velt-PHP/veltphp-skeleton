@@ -5,6 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "bacon/bacon-qr-code": "^2.0",
         "velt/database": "^0.1.0",
         "velt/framework": "^0.1.0",
         "velt/orm": "^0.1.0",

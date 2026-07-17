@@ -12,6 +12,7 @@ cp .env.example .env
 php bin/velt migrate
 php bin/velt db:seed
 php bin/velt serve
+php bin/velt preview
 ```
 
 Sur Windows PowerShell:
@@ -22,6 +23,7 @@ Copy-Item .env.example .env
 php bin/velt migrate
 php bin/velt db:seed
 php bin/velt serve
+php bin/velt preview
 ```
 
 L'application demarre par defaut sur `http://127.0.0.1:8000`.
@@ -86,6 +88,8 @@ Chaque feature regroupe sa logique applicative. Les controllers restent dans `fe
 | GET | `/docs` | Documentation rapide du projet |
 | GET | `/database` | Explication backend et database |
 | GET | `/api/projects` | JSON depuis `App\Projects\Models\Project` |
+| GET | `/api/preview/{id}` | JSON minimal pour la preview mobile |
+| GET | `/api/session/{id}` | Informations de session preview |
 | GET | `/api/preview/demo` | Erreur JSON propre pour la preview sans session |
 
 ## Vues Velt
@@ -174,6 +178,7 @@ La page welcome utilise une identite blanche et bleu royal vers bleu ciel, avec 
 php bin/velt help
 php bin/velt serve
 php bin/velt kernel:check
+php bin/velt preview [host:port]
 php bin/velt migrate
 php bin/velt migrate:rollback
 php bin/velt db:seed
@@ -193,7 +198,8 @@ Les tests couvrent:
 - seeder `DatabaseSeeder`;
 - modele ORM `Project`;
 - API `/api/projects`;
-- contrat JSON de `/api/preview/demo`.
+- contrat JSON de `/api/preview/demo`;
+- creation de session preview, QR SVG et JSON `Welcome!`.
 
 ## Checklist production
 
