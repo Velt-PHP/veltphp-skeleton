@@ -32,7 +32,7 @@ return Page::make('Velt')
                             ->class('hero-copy')
                             ->add(Text::make('Velt')->as('span')->class('hero-logo'))
                             ->add(Text::make('Framework PHP modulaire pour interfaces declaratives, API et apercus JSON.')->as('h1')->class('hero-title'))
-                            ->add(Text::make('Velt v0.1.4 beta fournit un skeleton MVC par feature avec kernel, routage HTTP, rendu UI, ORM, migrations, seeders, CLI et tests des la premiere installation.')->class('hero-subtitle'))
+                            ->add(Text::make('Velt v0.1.6 beta fournit un skeleton MVC par feature avec kernel, routage HTTP, rendu UI, preview mobile JSON, ORM, migrations, seeders, CLI et tests des la premiere installation.')->class('hero-subtitle'))
                             ->add(Text::make('Requiert PHP 8.2+, Composer et PDO. Node.js est optionnel pour reconstruire les assets Tailwind fournis par defaut.')->class('hero-text'))
                             ->add(
                                 Card::make()

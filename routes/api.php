@@ -19,5 +19,6 @@ return static function (Router $router): void {
     ], 404));
 
     $router->get('/api/preview/{id}', [PreviewController::class, 'show']);
+    $router->get('/api/preview-route/{path}', [PreviewController::class, 'route']);
     $router->get('/api/session/{id}', [PreviewController::class, 'session']);
 };

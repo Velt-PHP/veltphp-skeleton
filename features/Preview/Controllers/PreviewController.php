@@ -41,4 +41,21 @@ final class PreviewController
 
         return JsonResponse::json($session);
     }
+
+    public function route(string $path): JsonResponse
+    {
+        $service = new PreviewService();
+
+        try {
+            return JsonResponse::json($service->previewViewPayload($service->viewForPath($path)));
+        } catch (RuntimeException) {
+            return JsonResponse::json([
+                'success' => false,
+                'error' => [
+                    'code' => 'preview_route_not_found',
+                    'message' => 'Preview route not found.',
+                ],
+            ], 404);
+        }
+    }
 }

@@ -10,6 +10,8 @@ use BaconQrCode\Renderer\PlainTextRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use RuntimeException;
+use Velt\Ui\Renderers\JsonRenderer;
+use Velt\Ui\View\ViewFactory;
 
 final class PreviewService
 {
@@ -25,7 +27,7 @@ final class PreviewService
     /**
      * @return array<string, mixed>
      */
-    public function createSession(?string $host = null): array
+    public function createSession(?string $host = null, string $view = 'homepage'): array
     {
         $sessionId = bin2hex(random_bytes(6));
         $baseUrl = $this->baseUrl($host);
@@ -41,6 +43,7 @@ final class PreviewService
             'qr_payload' => $url,
             'qr_image' => $this->relativePath($qrPath),
             'message' => 'Welcome!',
+            'view' => $view,
             'created_at' => date(DATE_ATOM),
         ];
 
@@ -72,23 +75,44 @@ final class PreviewService
             throw new RuntimeException('Preview session not found.');
         }
 
-        return [
-            'schemaVersion' => '1.0',
-            'screen' => 'home',
-            'components' => [
-                [
-                    'type' => 'Text',
-                    'value' => $session['message'] ?? 'Welcome!',
-                    'props' => [
-                        'value' => $session['message'] ?? 'Welcome!',
-                    ],
-                ],
-            ],
-            'meta' => [
-                'sessionId' => $sessionId,
-                'source' => 'skeleton.preview',
-            ],
-        ];
+        $view = is_string($session['view'] ?? null) ? $session['view'] : 'homepage';
+        $page = (new ViewFactory($this->basePath . '/resources/views'))->make($view);
+        $payload = (new JsonRenderer())->toPreviewArray($page);
+        $payload['meta'] = array_merge($payload['meta'] ?? [], [
+            'sessionId' => $sessionId,
+            'source' => 'skeleton.preview',
+            'view' => $view,
+            'url' => $session['url'] ?? null,
+        ]);
+
+        return $payload;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function previewViewPayload(string $view): array
+    {
+        $page = (new ViewFactory($this->basePath . '/resources/views'))->make($view);
+        $payload = (new JsonRenderer())->toPreviewArray($page);
+        $payload['meta'] = array_merge($payload['meta'] ?? [], [
+            'source' => 'skeleton.preview',
+            'view' => $view,
+        ]);
+
+        return $payload;
+    }
+
+    public function viewForPath(string $path): string
+    {
+        $path = '/' . trim($path, '/');
+
+        return match ($path) {
+            '/', '', '/homepage' => 'homepage',
+            '/docs' => 'docs',
+            '/database' => 'database',
+            default => throw new RuntimeException("No preview view is mapped for path [{$path}]."),
+        };
     }
 
     public function qrTerminal(string $payload): string
@@ -104,13 +128,46 @@ final class PreviewService
             return rtrim($configured, '/');
         }
 
-        $host ??= '127.0.0.1:8000';
+        $host ??= $this->localNetworkHost();
 
         if (! str_contains($host, '://')) {
             $host = 'http://' . $host;
         }
 
         return rtrim($host, '/');
+    }
+
+    private function localNetworkHost(): string
+    {
+        $ip = self::detectLocalNetworkIp();
+
+        return $ip . ':8000';
+    }
+
+    public static function detectLocalNetworkIp(): string
+    {
+        $socket = @stream_socket_client('udp://8.8.8.8:80', $errno, $error, 1);
+
+        if (is_resource($socket)) {
+            $name = stream_socket_get_name($socket, false);
+            fclose($socket);
+
+            if (is_string($name) && preg_match('/^([0-9.]+):[0-9]+$/', $name, $matches) === 1) {
+                return $matches[1];
+            }
+        }
+
+        $hostname = gethostname();
+
+        if (is_string($hostname) && $hostname !== '') {
+            $ip = gethostbyname($hostname);
+
+            if ($ip !== $hostname && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                return $ip;
+            }
+        }
+
+        return '127.0.0.1';
     }
 
     private function writeQrSvg(string $payload, string $path): void

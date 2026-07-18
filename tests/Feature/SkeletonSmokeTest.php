@@ -89,7 +89,7 @@ final class SkeletonSmokeTest extends TestCase
         self::assertSame('preview_session_missing', $payload['error']['code'] ?? null);
     }
 
-    public function test_preview_session_returns_minimal_welcome_payload(): void
+    public function test_preview_session_returns_homepage_velt_tree_payload(): void
     {
         $basePath = dirname(__DIR__, 2);
         $service = new PreviewService($basePath);
@@ -104,10 +104,29 @@ final class SkeletonSmokeTest extends TestCase
 
         $payload = json_decode($response->body(), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertSame('1.0', $payload['schemaVersion']);
-        self::assertSame('home', $payload['screen']);
-        self::assertSame('Text', $payload['components'][0]['type']);
-        self::assertSame('Welcome!', $payload['components'][0]['value']);
+        self::assertSame(1, $payload['schemaVersion']);
+        self::assertSame('Velt', $payload['screen']);
+        self::assertSame('homepage', $payload['meta']['view'] ?? null);
+        self::assertSame('Card', $payload['components'][0]['type']);
+        self::assertStringContainsString(
+            'Framework PHP modulaire pour interfaces declaratives',
+            json_encode($payload, JSON_THROW_ON_ERROR),
+        );
+    }
+
+    public function test_preview_route_returns_docs_velt_tree_payload(): void
+    {
+        $response = $this->dispatcher()->dispatch(new Request('GET', '/api/preview-route/docs'));
+
+        self::assertSame(200, $response->status());
+        self::assertSame('application/json', $response->headers()['Content-Type'] ?? null);
+
+        $payload = json_decode($response->body(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame(1, $payload['schemaVersion']);
+        self::assertSame('Velt Documentation', $payload['screen']);
+        self::assertSame('docs', $payload['meta']['view'] ?? null);
+        self::assertStringContainsString('Documentation Velt', json_encode($payload, JSON_THROW_ON_ERROR));
     }
 
     private function dispatcher(): Dispatcher

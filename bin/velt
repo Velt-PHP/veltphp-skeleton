@@ -12,9 +12,12 @@ $argv = $_SERVER['argv'] ?? [];
 $command = $argv[1] ?? 'help';
 
 if ($command === 'serve') {
-    $host = $argv[2] ?? '127.0.0.1:8000';
+    $host = $argv[2] ?? '0.0.0.0:8000';
     $docroot = $basePath . '/public';
     echo "Starting Velt on http://{$host}\n";
+    if (str_starts_with($host, '0.0.0.0:')) {
+        echo "Network URL: http://" . detectLocalNetworkIp() . ':' . substr($host, strlen('0.0.0.0:')) . "\n";
+    }
     passthru(sprintf('php -S %s -t %s', escapeshellarg($host), escapeshellarg($docroot)));
     exit(0);
 }
@@ -26,7 +29,7 @@ try {
         'migrate' => migrate($basePath),
         'migrate:rollback' => rollback($basePath),
         'db:seed' => seed($basePath),
-        'preview' => preview($basePath, $argv[2] ?? null),
+        'preview' => preview($basePath, ...previewArguments($argv)),
         'kernel:check' => kernelCheck($kernel),
         'help' => help(),
         default => unknown($command),
@@ -36,13 +39,60 @@ try {
     exit(1);
 }
 
-function preview(string $basePath, ?string $host): void
+/**
+ * @param array<int, string> $argv
+ * @return array{0: string|null, 1: string}
+ */
+function previewArguments(array $argv): array
+{
+    $first = $argv[2] ?? null;
+    $second = $argv[3] ?? null;
+
+    if ($first === null) {
+        return [null, 'homepage'];
+    }
+
+    if (str_contains($first, ':') || str_contains($first, '://')) {
+        return [$first, $second ?? 'homepage'];
+    }
+
+    return [null, $first];
+}
+
+function detectLocalNetworkIp(): string
+{
+    $socket = @stream_socket_client('udp://8.8.8.8:80', $errno, $error, 1);
+
+    if (is_resource($socket)) {
+        $name = stream_socket_get_name($socket, false);
+        fclose($socket);
+
+        if (is_string($name) && preg_match('/^([0-9.]+):[0-9]+$/', $name, $matches) === 1) {
+            return $matches[1];
+        }
+    }
+
+    $hostname = gethostname();
+
+    if (is_string($hostname) && $hostname !== '') {
+        $ip = gethostbyname($hostname);
+
+        if ($ip !== $hostname && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return $ip;
+        }
+    }
+
+    return '127.0.0.1';
+}
+
+function preview(string $basePath, ?string $host, string $view): void
 {
     $service = new PreviewService($basePath);
-    $session = $service->createSession($host);
+    $session = $service->createSession($host, $view);
 
     echo "Velt mobile preview\n";
     echo "ID: {$session['id']}\n";
+    echo "View: {$session['view']}\n";
     echo "URL: {$session['url']}\n";
     echo "QR image: {$session['qr_image']}\n";
     echo $service->qrTerminal((string) $session['qr_payload']);
@@ -103,7 +153,7 @@ function help(): void
     echo "Velt project CLI\n";
     echo "Usage:\n";
     echo "  php bin/velt serve [host:port]\n";
-    echo "  php bin/velt preview [host:port]\n";
+    echo "  php bin/velt preview [host:port] [view]\n";
     echo "  php bin/velt migrate\n";
     echo "  php bin/velt migrate:rollback\n";
     echo "  php bin/velt db:seed\n";

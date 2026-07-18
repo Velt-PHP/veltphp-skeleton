@@ -26,7 +26,9 @@ php bin/velt serve
 php bin/velt preview
 ```
 
-L'application demarre par defaut sur `http://127.0.0.1:8000`.
+L'application ecoute par defaut sur `0.0.0.0:8000`, et `php bin/velt preview`
+genere une URL avec l'IP reseau du PC quand elle peut etre detectee. Le
+telephone doit etre sur le meme Wi-Fi.
 
 ## Stack incluse
 
@@ -88,7 +90,8 @@ Chaque feature regroupe sa logique applicative. Les controllers restent dans `fe
 | GET | `/docs` | Documentation rapide du projet |
 | GET | `/database` | Explication backend et database |
 | GET | `/api/projects` | JSON depuis `App\Projects\Models\Project` |
-| GET | `/api/preview/{id}` | JSON minimal pour la preview mobile |
+| GET | `/api/preview/{id}` | JSON Velt de la vue associee a une session preview |
+| GET | `/api/preview-route/{path}` | JSON Velt pour une route web connue (`docs`, `database`, `homepage`) |
 | GET | `/api/session/{id}` | Informations de session preview |
 | GET | `/api/preview/demo` | Erreur JSON propre pour la preview sans session |
 
@@ -178,7 +181,8 @@ La page welcome utilise une identite blanche et bleu royal vers bleu ciel, avec 
 php bin/velt help
 php bin/velt serve
 php bin/velt kernel:check
-php bin/velt preview [host:port]
+php bin/velt preview [host:port] [view]
+php bin/velt preview docs
 php bin/velt migrate
 php bin/velt migrate:rollback
 php bin/velt db:seed
@@ -199,7 +203,8 @@ Les tests couvrent:
 - modele ORM `Project`;
 - API `/api/projects`;
 - contrat JSON de `/api/preview/demo`;
-- creation de session preview, QR SVG et JSON `Welcome!`.
+- creation de session preview, QR SVG et JSON de la vraie vue Velt;
+- navigation JSON preview pour les routes documentees.
 
 ## Checklist production
 
