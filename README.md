@@ -26,9 +26,22 @@ php bin/velt serve
 php bin/velt preview
 ```
 
-L'application ecoute par defaut sur `0.0.0.0:8000`, et `php bin/velt preview`
-genere une URL avec l'IP reseau du PC quand elle peut etre detectee. Le
-telephone doit etre sur le meme Wi-Fi.
+L'application ecoute par defaut sur toutes les interfaces (`0.0.0.0:8000`).
+`php bin/velt preview` detecte l'adresse reseau du PC et la place dans le QR:
+
+```bash
+php bin/velt serve
+php bin/velt preview
+```
+
+Le terminal affiche l'URL locale et l'URL mobile. Le telephone doit etre sur le
+meme Wi-Fi. Si la detection automatique ne convient pas, l'adresse peut etre
+fournie explicitement:
+
+```bash
+php bin/velt serve 0.0.0.0:8000
+php bin/velt preview 192.168.1.20:8000
+```
 
 ## Stack incluse
 

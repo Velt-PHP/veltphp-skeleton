@@ -16,7 +16,11 @@ if ($command === 'serve') {
     $docroot = $basePath . '/public';
     echo "Starting Velt on http://{$host}\n";
     if (str_starts_with($host, '0.0.0.0:')) {
-        echo "Network URL: http://" . detectLocalNetworkIp() . ':' . substr($host, strlen('0.0.0.0:')) . "\n";
+        echo "Local URL: http://127.0.0.1:" . portFromHost($host) . "\n";
+        echo "Mobile URL: http://" . detectLocalNetworkIp() . ':' . portFromHost($host) . "\n";
+    } elseif (str_starts_with($host, '127.0.0.1:') || str_starts_with($host, 'localhost:')) {
+        echo "Warning: this address is not reachable from a phone.\n";
+        echo "Use php bin/velt serve 0.0.0.0:" . portFromHost($host) . " for mobile preview.\n";
     }
     passthru(sprintf('php -S %s -t %s', escapeshellarg($host), escapeshellarg($docroot)));
     exit(0);
@@ -83,6 +87,13 @@ function detectLocalNetworkIp(): string
     }
 
     return '127.0.0.1';
+}
+
+function portFromHost(string $host): string
+{
+    $parts = explode(':', $host);
+
+    return end($parts) ?: '8000';
 }
 
 function preview(string $basePath, ?string $host, string $view): void
