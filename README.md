@@ -4,6 +4,10 @@ Velt Skeleton est le point de depart officiel pour creer une application Velt. I
 
 Velt reste volontairement simple: une application PHP moderne, organisee en MVC + feature-based, avec une syntaxe UI declarative en `.velt.php`.
 
+> Statut : bêta. Les profils Web et API sont fonctionnels ; le profil cross-platform reste expérimental tant que le runtime PHP/JNI, le renderer Compose et la chaîne APK ne passent pas leurs tests instrumentés.
+
+Un profil n’est pas un drapeau cosmétique. Le configurateur réécrit les dépendances et supprime physiquement les couches inutiles. Une API ne contient donc ni pages, ni assets, ni configuration Node ; une application Web n’embarque pas Android ; une application cross-platform déclare son manifeste natif.
+
 ## Installation
 
 ```bash
@@ -28,6 +32,20 @@ velt new everywhere --type=cross-platform --database=sqlite
 - `cross-platform` conserve web/API/Preview, ajoute NativeWind, le manifeste `native/velt.json`, PHP 8.4 et les dépendances natives expérimentales.
 
 Le profil cross-platform reste une prérelease jusqu’à la validation du vrai bridge JNI, du renderer Compose et de l’APK signé. Aucun framework applicatif externe n’est intégré : le runtime, le kernel, HTTP, UI, database et ORM restent 100 % Velt ; seuls les outils de style sont externes.
+
+### Comparaison des sorties
+
+| Élément | Web | API | Cross-platform |
+| --- | --- | --- | --- |
+| routes Web et vues Velt | oui | non | oui |
+| routes API | oui | oui | oui |
+| Preview | non après configuration | non | oui |
+| styling | Tailwind par défaut | absent | NativeWind |
+| Node/package.json | selon styling | absent | oui |
+| `native/velt.json` | absent | absent | présent |
+| PHP minimum | 8.2 | 8.2 | 8.4 |
+
+Le configurateur intervient pendant `velt new`; ce n’est pas un convertisseur sans perte entre profils pour un projet déjà développé.
 
 L'application ecoute par defaut sur toutes les interfaces (`0.0.0.0:8000`).
 `velt preview` detecte l'adresse reseau du PC et la place dans le QR:
@@ -97,6 +115,13 @@ routes/
 ```
 
 Chaque feature regroupe sa logique applicative. Les controllers restent dans `features/*/Controllers`, les models dans `features/*/Models`, et les vues declaratives dans `resources/views`.
+
+```text
+public/index.php -> bootstrap/app.php -> kernel/providers -> routeur
+    -> contrôleur de feature -> service/modèle -> Response ou page Velt
+```
+
+Les règles métier ne doivent pas vivre dans `public/index.php`, les vues ou les fichiers de routes.
 
 ## Routes
 
@@ -239,3 +264,63 @@ velt db:seed
 ```
 
 Pour une release Packagist, taguer le repo seulement quand cette checklist est verte.
+
+## Configuration et environnements
+
+La CLI crée `.env` depuis l’exemple. Ne versionnez jamais ce fichier, une base contenant des données réelles, un jeton Preview, un keystore Android ou une clé de service.
+
+| Variable | Usage |
+| --- | --- |
+| `APP_ENV` | environnement courant |
+| `APP_DEBUG` | diagnostics locaux |
+| `VELT_PROJECT_TYPE` | profil généré |
+| `VELT_STYLING` | preset de style |
+| `DB_CONNECTION` | `sqlite`, `mysql` ou `pgsql` |
+| `DB_DATABASE` | fichier ou nom de base |
+
+## Déploiement Web/API
+
+1. installez une version PHP supportée et les extensions requises ;
+2. lancez `composer install --no-dev --prefer-dist --classmap-authoritative` ;
+3. pour Web, construisez avec `npm ci && npm run build` ;
+4. servez exclusivement le dossier `public/` ;
+5. injectez les secrets hors du dépôt ;
+6. migrez avec sauvegarde et stratégie de rollback ;
+7. désactivez les diagnostics sensibles ;
+8. exécutez les smoke tests après déploiement.
+
+`velt serve` utilise le serveur PHP intégré et reste réservé au développement.
+
+## Développement Android
+
+```text
+profil cross-platform -> manifeste de capacités -> Preview réseau
+    -> host Android -> PHP embarqué -> JNI -> Jetpack Compose -> APK/AAB
+```
+
+Le faux bridge de `velt/native` appartient uniquement à PHPUnit. Une release Android doit prouver le trajet réel PHP -> `nativephp_call()` -> JNI/Kotlin -> Compose -> PHP.
+
+## Dépannage
+
+- `velt` absent : ajoutez le dossier global Composer `vendor/bin` au `PATH`.
+- téléphone inaccessible : servez sur `0.0.0.0`, utilisez l’IP LAN et vérifiez le pare-feu.
+- Tailwind vide : lancez `npm ci`, vérifiez `content`, puis `npm run build`.
+- SQLite absent : activez `pdo_sqlite` pour le PHP réellement utilisé par le terminal.
+
+## Sécurité et contribution
+
+Les paramètres SQL passent par Database/ORM, le HTML par le renderer échappé de UI et l’autorisation reste explicitement applicative. Preview ne doit pas être exposé publiquement sans session signée. Les dépendances sont auditées avant release et aucun secret Android ne doit être committé.
+
+Une modification du skeleton se teste dans trois dossiers propres. Les assertions vérifient les fichiers absents autant que les fichiers présents. Toute dépendance doit être justifiée par profil et toute commande documentée doit fonctionner depuis la racine générée.
+
+## Limites avant stabilité
+
+- préversions Composer à synchroniser proprement avec Packagist ;
+- E2E `velt new` à automatiser sur Linux, macOS et Windows ;
+- cross-platform bloqué par les gates Android réelles ;
+- stratégie de mise à niveau des projets générés à documenter ;
+- templates de déploiement et durcissement production à compléter.
+
+## Licence
+
+Velt Skeleton est distribué sous licence MIT.
