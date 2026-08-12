@@ -22,6 +22,8 @@ final class SkeletonSmokeTest extends TestCase
         putenv('APP_ENV=testing');
         putenv('DB_CONNECTION=sqlite');
         putenv('DB_DATABASE=:memory:');
+        putenv('VELT_PROJECT_TYPE=cross-platform');
+        putenv('VELT_STYLING=nativewind');
     }
 
     public function test_ui_service_provider_is_available_from_generated_project_autoload(): void
@@ -160,10 +162,63 @@ final class SkeletonSmokeTest extends TestCase
         self::assertStringContainsString('VELT_STYLING=none', (string) file_get_contents($path . '/.env'));
     }
 
+    public function test_api_profile_physically_removes_web_and_preview_files(): void
+    {
+        $path = $this->profileFixture();
+
+        (new ProjectConfigurator($path))->configure('api', 'tailwind', 'sqlite');
+
+        self::assertFileDoesNotExist($path . '/routes/web.php');
+        self::assertFileDoesNotExist($path . '/routes/preview.php');
+        self::assertDirectoryDoesNotExist($path . '/resources');
+        self::assertFileDoesNotExist($path . '/package.json');
+
+        $composer = json_decode((string) file_get_contents($path . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertArrayNotHasKey('velt/ui', $composer['require']);
+        self::assertArrayNotHasKey('velt/preview', $composer['require']);
+        self::assertSame('^0.2.0', $composer['require']['velt/cli']);
+    }
+
+    public function test_cross_platform_profile_adds_native_manifest_and_nativewind(): void
+    {
+        $path = $this->profileFixture();
+
+        $result = (new ProjectConfigurator($path))->configure('cross-platform', 'tailwind', 'sqlite');
+
+        self::assertSame('nativewind', $result['styling']);
+        self::assertFileExists($path . '/native/velt.json');
+        self::assertFileExists($path . '/routes/web.php');
+        self::assertFileExists($path . '/routes/preview.php');
+        $package = json_decode((string) file_get_contents($path . '/package.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('^4.2.0', $package['devDependencies']['nativewind']);
+        $composer = json_decode((string) file_get_contents($path . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('^0.1.0@alpha', $composer['require']['velt/native']);
+    }
+
     private function dispatcher(): Dispatcher
     {
         $kernel = require dirname(__DIR__, 2) . '/bootstrap/app.php';
 
         return $kernel['dispatcher'];
+    }
+
+    private function profileFixture(): string
+    {
+        $path = sys_get_temp_dir() . '/velt-profile-' . bin2hex(random_bytes(6));
+        foreach (['database', 'features/Home', 'features/Documentation', 'features/Preview', 'resources/css', 'routes', 'public/assets'] as $directory) {
+            mkdir($path . '/' . $directory, 0777, true);
+        }
+
+        foreach (['routes/web.php', 'routes/api.php', 'routes/preview.php', 'resources/css/app.css', 'public/assets/app.css'] as $file) {
+            file_put_contents($path . '/' . $file, 'fixture');
+        }
+
+        file_put_contents($path . '/.env.example', "VELT_PROJECT_TYPE=web\nVELT_STYLING=tailwind\nDB_CONNECTION=sqlite\nDB_DATABASE=database/database.sqlite\n");
+        file_put_contents($path . '/composer.json', json_encode(['require' => ['php' => '^8.2', 'velt/framework' => '^0.1.0']], JSON_PRETTY_PRINT));
+        file_put_contents($path . '/package.json', json_encode(['devDependencies' => ['tailwindcss' => '^3.4.17']], JSON_PRETTY_PRINT));
+        file_put_contents($path . '/tailwind.config.js', 'fixture');
+        file_put_contents($path . '/postcss.config.js', 'fixture');
+
+        return $path;
     }
 }

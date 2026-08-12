@@ -15,6 +15,20 @@ velt db:seed
 velt serve
 ```
 
+## Profils réellement séparés
+
+```bash
+velt new site --type=web --styling=tailwind
+velt new service --type=api --database=pgsql
+velt new everywhere --type=cross-platform --database=sqlite
+```
+
+- `web` conserve les routes/pages web et installe Tailwind par défaut, puis génère immédiatement `public/assets/app.css`.
+- `api` retire physiquement les vues, assets, dépendance UI, Preview, Node, Tailwind et routes web.
+- `cross-platform` conserve web/API/Preview, ajoute NativeWind, le manifeste `native/velt.json`, PHP 8.4 et les dépendances natives expérimentales.
+
+Le profil cross-platform reste une prérelease jusqu’à la validation du vrai bridge JNI, du renderer Compose et de l’APK signé. Aucun framework applicatif externe n’est intégré : le runtime, le kernel, HTTP, UI, database et ORM restent 100 % Velt ; seuls les outils de style sont externes.
+
 L'application ecoute par defaut sur toutes les interfaces (`0.0.0.0:8000`).
 `velt preview` detecte l'adresse reseau du PC et la place dans le QR:
 

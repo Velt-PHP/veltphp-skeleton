@@ -30,14 +30,20 @@ foreach (glob($basePath . '/config/*.php') ?: [] as $configFile) {
 
 $app = new Application($basePath, $config);
 $app->registerProvider(HttpServiceProvider::class);
-$app->registerProvider(UiServiceProvider::class);
+if (config('project.type', 'web') !== 'api') {
+    $app->registerProvider(UiServiceProvider::class);
+}
 $app->registerProvider(DatabaseServiceProvider::class);
 
 /** @var Router $router */
 $router = new Router();
 $app->container()->instance(Router::class, $router);
 
-$routesFiles = config('project.type', 'web') === 'api' ? ['api'] : ['web', 'api'];
+$routesFiles = match (config('project.type', 'web')) {
+    'api' => ['api'],
+    'cross-platform' => ['web', 'api', 'preview'],
+    default => ['web', 'api'],
+};
 
 foreach ($routesFiles as $routesFile) {
     $path = $basePath . '/routes/' . $routesFile . '.php';

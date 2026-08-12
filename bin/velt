@@ -216,7 +216,7 @@ function help(): void
     echo "  velt migrate:rollback\n";
     echo "  velt db:seed\n";
     echo "  velt kernel:check\n";
-    echo "  velt project:configure --type=web --styling=tailwind --database=sqlite\n";
+    echo "  velt project:configure --type=web|api|cross-platform --styling=tailwind|nativewind|none --database=sqlite\n";
 }
 
 function unknown(string $command): void
