@@ -19,6 +19,16 @@ velt db:seed
 velt serve
 ```
 
+La commande publique recommandée est `velt`. Si la CLI globale n’est pas encore disponible dans le `PATH`, le skeleton fournit aussi un lanceur local à sa racine :
+
+```bash
+php velt serve
+php velt migrate
+php velt kernel:check
+```
+
+`php bin/velt` reste un détail interne utilisé par Composer et par le lanceur ; il n’est pas la commande présentée aux utilisateurs.
+
 ## Profils réellement séparés
 
 ```bash
@@ -217,6 +227,8 @@ Fichiers principaux:
 - `public/assets/app.css`
 
 La page welcome utilise une identite blanche et bleu royal vers bleu ciel, avec le logo Velt dans `public/assets/velt-logo.png`.
+
+Le starter visuel utilise une seule famille, Google Sans Flex, chargée depuis Google Fonts avec `sans-serif` comme fallback technique. La grille de fond, les cartes bordées sans ombre et les boutons à bord inférieur produisent une interface sobre et lisible sans CSS artisanal : tous les styles applicatifs restent des utilitaires Tailwind dans les vues Velt.
 
 ## CLI
 

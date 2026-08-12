@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Project-local Velt launcher.
+ *
+ * The global public command remains `velt`. This wrapper intentionally exists
+ * so a freshly cloned skeleton can also run `php velt <command>` before the
+ * Composer global bin directory is available on PATH.
+ */
+$arguments = $_SERVER['argv'] ?? [];
+$command = [PHP_BINARY, __DIR__ . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'velt'];
+
+foreach (array_slice($arguments, 1) as $argument) {
+    $command[] = $argument;
+}
+
+$process = proc_open($command, [STDIN, STDOUT, STDERR], $pipes, __DIR__);
+
+if (!is_resource($process)) {
+    fwrite(STDERR, "Unable to start the Velt project console.\n");
+    exit(1);
+}
+
+exit(proc_close($process));

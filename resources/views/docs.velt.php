@@ -8,103 +8,51 @@ use Velt\Ui\Components\Text;
 use Velt\Ui\Page;
 
 $stylesheets = config('project.styling', 'tailwind') === 'none' ? [] : ['/assets/app.css'];
-$cardClass = 'min-h-48 rounded-lg border border-blue-100 bg-white p-6 shadow-sm';
-$titleClass = 'text-lg font-bold text-slate-900';
-$textClass = 'mt-3 text-sm leading-7 text-slate-600';
+$panel = 'rounded-2xl border border-slate-200 bg-white p-6';
+$label = 'text-xs font-semibold uppercase tracking-[0.14em] text-blue-600';
+$title = 'mt-3 text-lg font-semibold tracking-tight text-slate-950';
+$copy = 'mt-2 text-sm leading-6 text-slate-600';
+$nav = 'text-sm font-medium text-slate-600 transition-colors hover:text-blue-600';
+$github = 'inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 before:block before:h-4 before:w-4 before:bg-github-mark before:bg-contain before:bg-center before:bg-no-repeat before:content-[\'\']';
 
 return Page::make('Velt Documentation')
     ->layout('guest')
     ->meta([
-        'title' => 'Documentation Velt',
-        'description' => 'Documentation du skeleton Velt, de l installation aux bonnes pratiques.',
+        'title' => 'Project guide — Velt',
+        'description' => 'The essential guide for building and shipping this Velt application.',
         'stylesheets' => $stylesheets,
     ])
     ->add(
-        Card::make()
-            ->class('mx-auto flex min-h-screen w-full max-w-6xl flex-col items-center px-4 pb-16 pt-6 text-center text-slate-900')
+        Card::make()->class('min-h-screen bg-slate-50 bg-velt-grid bg-grid font-sans text-slate-950')
             ->add(
-                Card::make()
-                    ->class('flex w-full items-center gap-5 border-b border-blue-100 pb-5')
-                    ->add(Link::make('VELT', '/')->class('mr-auto text-xl font-extrabold tracking-[0.2em] text-velt-blue'))
-                    ->add(Link::make('Accueil', '/')->class('text-sm font-semibold text-slate-600 transition hover:text-velt-blue'))
-                    ->add(Link::make('Donnees', '/database')->class('text-sm font-semibold text-slate-600 transition hover:text-velt-blue'))
-            )
-            ->add(Text::make('Documentation Velt')->as('h1')->class('mt-12 text-4xl font-black leading-none text-velt-blue sm:text-6xl'))
-            ->add(Text::make('Velt organise une application PHP autour d un kernel modulaire, de routes HTTP, de controllers par feature et de pages declaratives capables de produire du HTML ou du JSON.')->class('mx-auto mt-4 max-w-3xl text-base leading-8 text-slate-600'))
-            ->add(
-                Card::make()
-                    ->class('mt-9 grid w-full grid-cols-1 gap-5 text-left md:grid-cols-2')
+                Card::make()->class('mx-auto w-full max-w-6xl px-5 pb-16 pt-5 sm:px-8')
                     ->add(
-                        Card::make()
-                            ->class($cardClass)
-                            ->add(Text::make('Introduction')->as('h2')->class($titleClass))
-                            ->add(Text::make('Velt resout le demarrage d applications PHP modernes: structure claire, composants modulaires, UI declarative, API JSON et socle database pret pour les demos.')->class($textClass))
+                        Card::make()->class('flex min-h-14 items-center gap-5 rounded-2xl border border-slate-200 bg-white px-4')
+                            ->add(Link::make('VELT', '/')->class('mr-auto text-base font-bold tracking-[0.18em] text-blue-600'))
+                            ->add(Link::make('Home', '/')->class($nav))
+                            ->add(Link::make('Data', '/database')->class($nav))
+                            ->add(Link::make('GitHub', 'https://github.com/Velt-PHP')->class($github))
                     )
                     ->add(
-                        Card::make()
-                            ->class($cardClass)
-                            ->add(Text::make('Prerequis')->as('h2')->class($titleClass))
-                            ->add(Text::make('PHP 8.2 ou plus, Composer, extension PDO et SQLite pour le mode local. Node.js sert uniquement a reconstruire Tailwind.')->class($textClass))
-                    )
-                    ->add(
-                        Card::make()
-                            ->class($cardClass)
-                            ->add(Text::make('Philosophie')->as('h2')->class($titleClass))
-                            ->add(Text::make('Le kernel reste central, les providers enregistrent les modules, le container resout les services et les features regroupent la logique metier.')->class($textClass))
-                    )
-                    ->add(
-                        Card::make()
-                            ->class($cardClass)
-                            ->add(Text::make('Demarrage rapide')->as('h2')->class($titleClass))
-                            ->add(Text::make('Commandes: velt new mon-app, velt migrate, velt db:seed et velt serve. Le binaire global velt est l interface publique.')->class($textClass))
-                    )
-                    ->add(
-                        Card::make()
-                            ->class($cardClass)
-                            ->add(Text::make('Architecture')->as('h2')->class($titleClass))
-                            ->add(Text::make('Le code applicatif vit dans features. Les routes sont dans routes, les vues Velt dans resources/views et le point d entree HTTP dans public/index.php.')->class($textClass))
-                    )
-                    ->add(
-                        Card::make()
-                            ->class($cardClass)
-                            ->add(Text::make('Guides pratiques')->as('h2')->class($titleClass))
-                            ->add(Text::make('Routes web dans routes/web.php, routes API dans routes/api.php, controllers par feature, vues .velt.php et modeles ORM dans features/*/Models.')->class($textClass))
-                    )
-                    ->add(
-                        Card::make()
-                            ->class($cardClass)
-                            ->add(Text::make('Reference API')->as('h2')->class($titleClass))
-                            ->add(Text::make('Classes principales: Application, Router, Dispatcher, Request, Response, Page, WebRenderer, JsonRenderer, DB, Migrator et Model.')->class($textClass))
-                    )
-                    ->add(
-                        Card::make()
-                            ->class($cardClass)
-                            ->add(Text::make('Configuration')->as('h2')->class($titleClass))
-                            ->add(Text::make('Les variables APP_NAME, APP_ENV, APP_DEBUG, APP_URL, DB_CONNECTION et DB_DATABASE pilotent le comportement local et production.')->class($textClass))
-                    )
-                    ->add(
-                        Card::make()
-                            ->class($cardClass)
-                            ->add(Text::make('Deploiement')->as('h2')->class($titleClass))
-                            ->add(Text::make('Pointer le serveur web vers public, installer les dependances Composer, configurer .env, executer les migrations et garder APP_DEBUG=false.')->class($textClass))
-                    )
-                    ->add(
-                        Card::make()
-                            ->class($cardClass)
-                            ->add(Text::make('Securite')->as('h2')->class($titleClass))
-                            ->add(Text::make('Le rendu echappe le contenu HTML, la database utilise des requetes preparees et les formulaires peuvent declarer une intention CSRF.')->class($textClass))
-                    )
-                    ->add(
-                        Card::make()
-                            ->class($cardClass)
-                            ->add(Text::make('Bonnes pratiques')->as('h2')->class($titleClass))
-                            ->add(Text::make('Respecter strict_types, PSR-4, controllers minces, logique par feature, tests de route et configuration separee de l environnement.')->class($textClass))
-                    )
-                    ->add(
-                        Card::make()
-                            ->class($cardClass)
-                            ->add(Text::make('Support')->as('h2')->class($titleClass))
-                            ->add(Text::make('Signaler les bugs via GitHub Issues dans le repo concerne. Les contributions doivent rester petites, testees et documentees.')->class($textClass))
+                        Card::make()->class('grid gap-8 py-14 lg:grid-cols-[.72fr_1.28fr] lg:py-20')
+                            ->add(
+                                Card::make()->class('lg:sticky lg:top-6 lg:self-start')
+                                    ->add(Text::make('PROJECT GUIDE')->as('small')->class($label))
+                                    ->add(Text::make('Build the application one clear feature at a time.')->as('h1')->class('mt-4 text-3xl font-semibold leading-tight tracking-[-0.035em] text-slate-950 sm:text-4xl'))
+                                    ->add(Text::make('This starter connects the framework essentials so you can focus on product behavior. Begin with one route, one feature and one useful test.')->class('mt-4 max-w-md text-base leading-7 text-slate-600'))
+                                    ->add(Link::make('Explore the data layer', '/database')->class('mt-6 inline-flex rounded-xl border border-blue-700 border-b-4 bg-blue-600 px-5 py-3 text-sm font-semibold text-white active:translate-y-[2px] active:border-b-2'))
+                            )
+                            ->add(
+                                Card::make()->class('grid gap-4 md:grid-cols-2')
+                                    ->add(Card::make()->class($panel)->add(Text::make('01 · Run locally')->as('small')->class($label))->add(Text::make('Start the development server')->as('h2')->class($title))->add(Text::make('Use velt serve after installing the CLI globally. From this repository, php velt serve provides the project-local fallback.')->class($copy)))
+                                    ->add(Card::make()->class($panel)->add(Text::make('02 · Add a feature')->as('small')->class($label))->add(Text::make('Keep product code together')->as('h2')->class($title))->add(Text::make('Create controllers, models and services inside features/<Name>. Routes remain small and point to application behavior.')->class($copy)))
+                                    ->add(Card::make()->class($panel)->add(Text::make('03 · Design a screen')->as('small')->class($label))->add(Text::make('Use declarative Velt views')->as('h2')->class($title))->add(Text::make('Views in resources/views return a Page composed from typed components. Tailwind handles the Web presentation.')->class($copy)))
+                                    ->add(Card::make()->class($panel)->add(Text::make('04 · Configure safely')->as('small')->class($label))->add(Text::make('Keep environments separate')->as('h2')->class($title))->add(Text::make('Store local settings in .env, keep secrets outside Git and use config() from application code.')->class($copy)))
+                                    ->add(Card::make()->class($panel)->add(Text::make('05 · Persist data')->as('small')->class($label))->add(Text::make('Migrate before serving users')->as('h2')->class($title))->add(Text::make('Run velt migrate, seed only development data and use prepared Database or ORM operations.')->class($copy)))
+                                    ->add(Card::make()->class($panel)->add(Text::make('06 · Verify behavior')->as('small')->class($label))->add(Text::make('Make every change testable')->as('h2')->class($title))->add(Text::make('Run composer test and npm run build. Add a regression test beside each route, service or data behavior you change.')->class($copy)))
+                                    ->add(Card::make()->class($panel)->add(Text::make('07 · Prepare delivery')->as('small')->class($label))->add(Text::make('Ship from a clean build')->as('h2')->class($title))->add(Text::make('Install production dependencies, compile assets, expose only public/ and disable sensitive debug output.')->class($copy)))
+                                    ->add(Card::make()->class($panel)->add(Text::make('08 · Get support')->as('small')->class($label))->add(Text::make('Work with the community')->as('h2')->class($title))->add(Text::make('Open an issue in the repository that owns the behavior. Include a reproduction, expected result and environment details.')->class($copy)))
+                            )
                     )
             )
     );

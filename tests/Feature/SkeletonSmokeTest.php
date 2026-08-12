@@ -29,6 +29,7 @@ final class SkeletonSmokeTest extends TestCase
     public function test_ui_service_provider_is_available_from_generated_project_autoload(): void
     {
         self::assertTrue(class_exists(UiServiceProvider::class));
+        self::assertFileExists(dirname(__DIR__, 2) . '/velt');
     }
 
     public function test_home_route_returns_rendered_velt_page_with_assets(): void
@@ -38,8 +39,10 @@ final class SkeletonSmokeTest extends TestCase
         self::assertSame(200, $response->status());
         self::assertStringContainsString('<!doctype html>', $response->body());
         self::assertStringContainsString('/assets/app.css', $response->body());
-        self::assertStringContainsString('Framework PHP modulaire pour interfaces declaratives', $response->body());
-        self::assertStringContainsString('tracking-[0.2em]', $response->body());
+        self::assertStringContainsString('A focused starting point for the product you want to ship.', $response->body());
+        self::assertStringContainsString('bg-velt-grid', $response->body());
+        self::assertStringContainsString('https://github.com/Velt-PHP', $response->body());
+        self::assertStringNotContainsString('shadow-', $response->body());
         self::assertStringNotContainsString('feature-card', $response->body());
     }
 
@@ -52,8 +55,8 @@ final class SkeletonSmokeTest extends TestCase
 
         self::assertSame(200, $docs->status());
         self::assertSame(200, $database->status());
-        self::assertStringContainsString('Documentation', $docs->body());
-        self::assertStringContainsString('Backend et base de donnees', $database->body());
+        self::assertStringContainsString('Build the application one clear feature at a time.', $docs->body());
+        self::assertStringContainsString('A dependable place for your application data.', $database->body());
     }
 
     public function test_migrations_seeders_model_and_projects_api_work_together(): void
@@ -113,7 +116,7 @@ final class SkeletonSmokeTest extends TestCase
         self::assertSame('homepage', $payload['meta']['view'] ?? null);
         self::assertSame('Card', $payload['components'][0]['type']);
         self::assertStringContainsString(
-            'Framework PHP modulaire pour interfaces declaratives',
+            'A focused starting point for the product you want to ship.',
             json_encode($payload, JSON_THROW_ON_ERROR),
         );
     }
@@ -130,7 +133,7 @@ final class SkeletonSmokeTest extends TestCase
         self::assertSame(1, $payload['schemaVersion']);
         self::assertSame('Velt Documentation', $payload['screen']);
         self::assertSame('docs', $payload['meta']['view'] ?? null);
-        self::assertStringContainsString('Documentation Velt', json_encode($payload, JSON_THROW_ON_ERROR));
+        self::assertStringContainsString('Build the application one clear feature at a time.', json_encode($payload, JSON_THROW_ON_ERROR));
     }
 
     public function test_project_configurator_creates_a_web_tailwind_sqlite_profile(): void
