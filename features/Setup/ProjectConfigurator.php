@@ -178,8 +178,14 @@ final class ProjectConfigurator
 
         if ($type === 'cross-platform') {
             $base['bacon/bacon-qr-code'] = '^2.0';
-            $base['velt/native'] = '^0.1.0@alpha';
+            $base['velt/native'] = '^0.1@alpha';
             $base['velt/preview'] = '^0.1.1';
+            $composer['repositories'] = [[
+                'type' => 'vcs',
+                'url' => 'https://github.com/Velt-PHP/velt-native',
+            ]];
+        } else {
+            unset($composer['repositories']);
         }
 
         ksort($base);

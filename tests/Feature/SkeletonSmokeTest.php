@@ -192,7 +192,8 @@ final class SkeletonSmokeTest extends TestCase
         $package = json_decode((string) file_get_contents($path . '/package.json'), true, 512, JSON_THROW_ON_ERROR);
         self::assertSame('^4.2.0', $package['devDependencies']['nativewind']);
         $composer = json_decode((string) file_get_contents($path . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame('^0.1.0@alpha', $composer['require']['velt/native']);
+        self::assertSame('^0.1@alpha', $composer['require']['velt/native']);
+        self::assertSame('https://github.com/Velt-PHP/velt-native', $composer['repositories'][0]['url']);
     }
 
     private function dispatcher(): Dispatcher
