@@ -9,6 +9,15 @@ use App\Preview\Services\PreviewService;
 use App\Setup\ProjectConfigurator;
 
 $basePath = dirname(__DIR__);
+$autoload = $basePath . '/vendor/autoload.php';
+
+if (!is_file($autoload)) {
+    fwrite(STDERR, "Velt error: dependencies are not installed. Run composer install.\n");
+    exit(1);
+}
+
+require $autoload;
+
 $argv = $_SERVER['argv'] ?? [];
 $command = $argv[1] ?? 'help';
 $options = commandOptions($argv);
