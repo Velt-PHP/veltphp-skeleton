@@ -7,31 +7,20 @@ Velt reste volontairement simple: une application PHP moderne, organisee en MVC 
 ## Installation
 
 ```bash
-composer install
-cp .env.example .env
-php bin/velt migrate
-php bin/velt db:seed
-php bin/velt serve
-php bin/velt preview
-```
-
-Sur Windows PowerShell:
-
-```powershell
-composer install
-Copy-Item .env.example .env
-php bin/velt migrate
-php bin/velt db:seed
-php bin/velt serve
-php bin/velt preview
+composer global require velt/cli
+velt new my-app
+cd my-app
+velt migrate
+velt db:seed
+velt serve
 ```
 
 L'application ecoute par defaut sur toutes les interfaces (`0.0.0.0:8000`).
-`php bin/velt preview` detecte l'adresse reseau du PC et la place dans le QR:
+`velt preview` detecte l'adresse reseau du PC et la place dans le QR:
 
 ```bash
-php bin/velt serve
-php bin/velt preview
+velt serve
+velt preview
 ```
 
 Le terminal affiche l'URL locale et l'URL mobile. Le telephone doit etre sur le
@@ -39,8 +28,8 @@ meme Wi-Fi. Si la detection automatique ne convient pas, l'adresse peut etre
 fournie explicitement:
 
 ```bash
-php bin/velt serve 0.0.0.0:8000
-php bin/velt preview 192.168.1.20:8000
+velt serve 0.0.0.0:8000
+velt preview 192.168.1.20:8000
 ```
 
 ## Stack incluse
@@ -123,7 +112,7 @@ return Page::make('Dashboard')
     ->meta(['title' => 'Dashboard - Velt'])
     ->add(
         Card::make()
-            ->class('panel')
+            ->class('rounded-lg border border-slate-200 bg-white p-6 shadow-sm')
             ->add(Text::make('Bienvenue')->as('h1'))
     );
 ```
@@ -142,19 +131,19 @@ DB_DATABASE=database/database.sqlite
 Lancer les migrations:
 
 ```bash
-php bin/velt migrate
+velt migrate
 ```
 
 Charger les donnees de demo:
 
 ```bash
-php bin/velt db:seed
+velt db:seed
 ```
 
 Rollback de la derniere batch:
 
 ```bash
-php bin/velt migrate:rollback
+velt migrate:rollback
 ```
 
 Exemple de modele:
@@ -172,7 +161,9 @@ final class Project extends Model
 
 ## Tailwind
 
-Tailwind est inclus par defaut pour que chaque nouveau projet Velt ait une base frontend propre.
+Tailwind est inclus par defaut dans le profil web. `resources/css/app.css` ne contient que les trois directives Tailwind; les vues utilisent directement les utilitaires, sans couche CSS artisanale. Le profil API ne charge aucun asset web et la CLI saute l'installation Node.
+
+NativeWind sera le preset du profil universel web + Android. Ce profil ne sera proposé par `velt new` qu'une fois le renderer Compose et la chaîne APK réellement disponibles; l'installer dans un projet web PHP actuel créerait une fausse promesse de compatibilité React Native.
 
 ```bash
 npm install
@@ -191,14 +182,15 @@ La page welcome utilise une identite blanche et bleu royal vers bleu ciel, avec 
 ## CLI
 
 ```bash
-php bin/velt help
-php bin/velt serve
-php bin/velt kernel:check
-php bin/velt preview [host:port] [view]
-php bin/velt preview docs
-php bin/velt migrate
-php bin/velt migrate:rollback
-php bin/velt db:seed
+velt help
+velt serve
+velt kernel:check
+velt preview [host:port] [view]
+velt preview docs
+velt migrate
+velt migrate:rollback
+velt db:seed
+velt project:configure --type=web --styling=tailwind --database=sqlite
 ```
 
 ## Tests
@@ -227,9 +219,9 @@ Avant publication:
 composer validate
 composer install
 composer test
-php bin/velt kernel:check
-php bin/velt migrate
-php bin/velt db:seed
+velt kernel:check
+velt migrate
+velt db:seed
 ```
 
 Pour une release Packagist, taguer le repo seulement quand cette checklist est verte.

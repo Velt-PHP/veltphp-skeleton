@@ -6,10 +6,12 @@ declare(strict_types=1);
 use Velt\Database\Migrations\Migrator;
 use Velt\Database\Seeders\SeederRunner;
 use App\Preview\Services\PreviewService;
+use App\Setup\ProjectConfigurator;
 
 $basePath = dirname(__DIR__);
 $argv = $_SERVER['argv'] ?? [];
 $command = $argv[1] ?? 'help';
+$options = commandOptions($argv);
 
 if ($command === 'serve') {
     $host = $argv[2] ?? '0.0.0.0:8000';
@@ -20,10 +22,20 @@ if ($command === 'serve') {
         echo "Mobile URL: http://" . detectLocalNetworkIp() . ':' . portFromHost($host) . "\n";
     } elseif (str_starts_with($host, '127.0.0.1:') || str_starts_with($host, 'localhost:')) {
         echo "Warning: this address is not reachable from a phone.\n";
-        echo "Use php bin/velt serve 0.0.0.0:" . portFromHost($host) . " for mobile preview.\n";
+        echo "Use velt serve 0.0.0.0:" . portFromHost($host) . " for mobile preview.\n";
     }
     passthru(sprintf('php -S %s -t %s', escapeshellarg($host), escapeshellarg($docroot)));
     exit(0);
+}
+
+if ($command === 'project:configure') {
+    try {
+        configureProject($basePath, $options);
+        exit(0);
+    } catch (Throwable $exception) {
+        fwrite(STDERR, "Velt error: {$exception->getMessage()}\n");
+        exit(1);
+    }
 }
 
 $kernel = require $basePath . '/bootstrap/app.php';
@@ -41,6 +53,41 @@ try {
 } catch (Throwable $exception) {
     fwrite(STDERR, "Velt error: {$exception->getMessage()}\n");
     exit(1);
+}
+
+/**
+ * @param array<int, string> $argv
+ * @return array<string, string|bool>
+ */
+function commandOptions(array $argv): array
+{
+    $options = [];
+
+    foreach (array_slice($argv, 2) as $token) {
+        if (!str_starts_with($token, '--')) {
+            continue;
+        }
+
+        [$name, $value] = array_pad(explode('=', substr($token, 2), 2), 2, true);
+        $options[$name] = $value;
+    }
+
+    return $options;
+}
+
+/** @param array<string, string|bool> $options */
+function configureProject(string $basePath, array $options): void
+{
+    $result = (new ProjectConfigurator($basePath))->configure(
+        (string) ($options['type'] ?? 'web'),
+        (string) ($options['styling'] ?? 'tailwind'),
+        (string) ($options['database'] ?? 'sqlite'),
+    );
+
+    echo "Velt project configured.\n";
+    echo "Type: {$result['type']}\n";
+    echo "Styling: {$result['styling']}\n";
+    echo "Database: {$result['database']}\n";
 }
 
 /**
@@ -163,15 +210,16 @@ function help(): void
 {
     echo "Velt project CLI\n";
     echo "Usage:\n";
-    echo "  php bin/velt serve [host:port]\n";
-    echo "  php bin/velt preview [host:port] [view]\n";
-    echo "  php bin/velt migrate\n";
-    echo "  php bin/velt migrate:rollback\n";
-    echo "  php bin/velt db:seed\n";
-    echo "  php bin/velt kernel:check\n";
+    echo "  velt serve [host:port]\n";
+    echo "  velt preview [host:port] [view]\n";
+    echo "  velt migrate\n";
+    echo "  velt migrate:rollback\n";
+    echo "  velt db:seed\n";
+    echo "  velt kernel:check\n";
+    echo "  velt project:configure --type=web --styling=tailwind --database=sqlite\n";
 }
 
 function unknown(string $command): void
 {
-    throw new InvalidArgumentException("Unknown command [{$command}]. Run php bin/velt help.");
+    throw new InvalidArgumentException("Unknown command [{$command}]. Run velt help.");
 }

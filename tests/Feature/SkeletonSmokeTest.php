@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use PHPUnit\Framework\TestCase;
 use App\Preview\Services\PreviewService;
+use App\Setup\ProjectConfigurator;
 use Velt\Database\Migrations\Migrator;
 use Velt\Database\Seeders\SeederRunner;
 use Velt\Http\Dispatcher;
@@ -36,7 +37,8 @@ final class SkeletonSmokeTest extends TestCase
         self::assertStringContainsString('<!doctype html>', $response->body());
         self::assertStringContainsString('/assets/app.css', $response->body());
         self::assertStringContainsString('Framework PHP modulaire pour interfaces declaratives', $response->body());
-        self::assertStringContainsString('logo-mark', $response->body());
+        self::assertStringContainsString('tracking-[0.2em]', $response->body());
+        self::assertStringNotContainsString('feature-card', $response->body());
     }
 
     public function test_documentation_pages_are_registered(): void
@@ -127,6 +129,35 @@ final class SkeletonSmokeTest extends TestCase
         self::assertSame('Velt Documentation', $payload['screen']);
         self::assertSame('docs', $payload['meta']['view'] ?? null);
         self::assertStringContainsString('Documentation Velt', json_encode($payload, JSON_THROW_ON_ERROR));
+    }
+
+    public function test_project_configurator_creates_a_web_tailwind_sqlite_profile(): void
+    {
+        $path = sys_get_temp_dir() . '/velt-skeleton-' . bin2hex(random_bytes(6));
+        mkdir($path . '/database', 0777, true);
+        file_put_contents($path . '/.env.example', "APP_NAME=Velt\nVELT_PROJECT_TYPE=web\nVELT_STYLING=tailwind\nDB_CONNECTION=sqlite\nDB_DATABASE=database/database.sqlite\n");
+
+        $result = (new ProjectConfigurator($path))->configure('web', 'tailwind', 'sqlite');
+        $environment = (string) file_get_contents($path . '/.env');
+
+        self::assertSame('web', $result['type']);
+        self::assertSame('tailwind', $result['styling']);
+        self::assertStringContainsString('VELT_PROJECT_TYPE=web', $environment);
+        self::assertStringContainsString('VELT_STYLING=tailwind', $environment);
+        self::assertFileExists($path . '/database/database.sqlite');
+    }
+
+    public function test_api_profile_forces_frontend_styling_off(): void
+    {
+        $path = sys_get_temp_dir() . '/velt-skeleton-' . bin2hex(random_bytes(6));
+        mkdir($path . '/database', 0777, true);
+        file_put_contents($path . '/.env.example', "VELT_PROJECT_TYPE=web\nVELT_STYLING=tailwind\nDB_CONNECTION=sqlite\nDB_DATABASE=database/database.sqlite\n");
+
+        $result = (new ProjectConfigurator($path))->configure('api', 'tailwind', 'mysql');
+
+        self::assertSame('api', $result['type']);
+        self::assertSame('none', $result['styling']);
+        self::assertStringContainsString('VELT_STYLING=none', (string) file_get_contents($path . '/.env'));
     }
 
     private function dispatcher(): Dispatcher

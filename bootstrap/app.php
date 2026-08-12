@@ -37,7 +37,9 @@ $app->registerProvider(DatabaseServiceProvider::class);
 $router = new Router();
 $app->container()->instance(Router::class, $router);
 
-foreach (['web', 'api'] as $routesFile) {
+$routesFiles = config('project.type', 'web') === 'api' ? ['api'] : ['web', 'api'];
+
+foreach ($routesFiles as $routesFile) {
     $path = $basePath . '/routes/' . $routesFile . '.php';
     if (file_exists($path)) {
         $routes = require $path;
